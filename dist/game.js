@@ -1,0 +1,1 @@
+function draw(){var e=document.getElementById("canvas");e.width=800,e.height=400,console.log(e);var t=e.getContext("2d");t.fillRect(25,25,100,100),t.clearRect(45,45,60,60),t.strokeRect(50,50,50,50)}
