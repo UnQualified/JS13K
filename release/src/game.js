@@ -1,11 +1,23 @@
-function draw() {
+function game() {
+
   var canvas = document.getElementById('canvas');
-  // resize the canvas
+  var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 400;
-  console.log(canvas);
-  var ctx = canvas.getContext('2d');
-  ctx.fillRect(25, 25, 100, 100);
-  ctx.clearRect(45, 45, 60, 60);
-  ctx.strokeRect(50, 50, 50, 50);
+
+  window.requestAnimationFrame(game);
+
+  var keyStroke = new KeyStroke();
+  ctx.font = "22px sans-serif";
+  ctx.fillText(keyStroke.getLetter(), 10, 20);
 }
+
+function KeyStroke() {}
+KeyStroke.prototype.getLetter = function() {
+  var MIN = 65;
+  var MAX = 90;
+  return String.fromCharCode(this.getRandom(MIN, MAX)).toLowerCase();
+};
+KeyStroke.prototype.getRandom = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
