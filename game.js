@@ -1,30 +1,24 @@
 function game() {
-  
-  var game = new Core();
-  game.init();
+
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = 800;
+  canvas.height = 400;
+
+  window.requestAnimationFrame(game);
+
+  var keyStroke = new KeyStroke();
+  ctx.font = "22px sans-serif";
+  // this is happening 60 times a second!!
+  ctx.fillText(keyStroke.getLetter(), 10, 20);
 }
 
-function Core() {
-	this.canvas = document.getElementById('canvas');
-	this.ctx = this.canvas.getContext('2d');
-	
-	// resize the canvas
-	this.canvas.width = 800;
-	this.canvas.height = 400;
-}
-
-Core.prototype.init = function() {
-	window.requestAnimationFrame(this.draw);
+function KeyStroke() {}
+KeyStroke.prototype.getLetter = function() {
+  var MIN = 65;
+  var MAX = 90;
+  return String.fromCharCode(this.getRandom(MIN, MAX)).toLowerCase();
 };
-
-Core.prototype.draw = function() {
-	this.ctx.font = "22px sans-serif";
-	this.ctx.fillText(this.getLetter(), 10, 50);
-	window.requestAnimationFrame();
-};
-
-Core.prototype.getLetter = function() {
-	var MIN = 65;
-	var MAX = 90;
-	return String.fromCharCode(MIN).toLowerCase();
+KeyStroke.prototype.getRandom = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
