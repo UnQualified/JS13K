@@ -8,6 +8,8 @@ function game() {
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
   var p2Keys = new KeyStroke(availableKeys.getKey());
+  var p1 = player(10, 20, keyStroke);
+  var p2 = player(100, 20, p2Keys);
 
   window.requestAnimationFrame(loop);
   window.addEventListener("keydown", function (event) {
@@ -15,18 +17,20 @@ function game() {
   		if (event.keyCode === keyStroke.currentLetter) {
   			availableKeys.keys[keyStroke.currentLetter - 65].available = true;
   			keyStroke.assignLetter(availableKeys.getKey());
+  			p1.updateScore();
   		}
   		// player 2
   		else if (event.keyCode === p2Keys.currentLetter) {
   			availableKeys.keys[p2Keys.currentLetter - 65].avaialble = true;
   			p2Keys.assignLetter(availableKeys.getKey());
+  			p2.updateScore();
   		}
   });
   
   function loop() {
   		clear();
-		var p1 = player(10, 20, keyStroke);
-		var p2 = player(100, 20, p2Keys);
+		p1.draw();
+		p2.draw();
 		
 		window.requestAnimationFrame(loop);
   }
@@ -36,8 +40,22 @@ function game() {
   }
   
   function player(x, y, _keystroke) {
+  		var score = 0;
+  		
   		ctx.font = '22px sans-serif';
-  		ctx.fillText(_keystroke.getLetter(), x, y);
+  		  		
+  		return {
+  			draw: function() {
+  				ctx.fillText(_keystroke.getLetter(), x, y);
+  				ctx.fillText(score, x, y + 50);
+  			},
+  			getScore: function() {
+  				return score;
+  			},
+  			updateScore: function(inc) {
+  				score += 10;
+  			}
+  		};
   }
 }
 
