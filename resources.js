@@ -36,3 +36,21 @@ AvailableKeys.prototype.getKey = function() {
 		return this.getKey();
 	}
 };
+
+function Attack(context) {
+	this.ctx = context;
+	this.available = false;
+}
+Attack.prototype.displayAttacks = function(canvasCentre) {
+	this.available = true;
+	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
+	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
+	this.ctx.fillText('electric', canvasCentre.x + 100, canvasCentre.y);
+	this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
+};
+Attack.prototype.selectedAttack = function(msg) {
+	if (this.available) {
+		this.ctx.textAlign = 'left';
+		this.ctx.fillText(msg + ' selected', 20, 100);
+	}
+}; 
