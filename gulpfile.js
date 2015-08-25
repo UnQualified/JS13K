@@ -7,6 +7,7 @@ var zip = require('gulp-zip');
 var size = require('gulp-size');
 var eslint = require('gulp-eslint');
 var colors = require('colors');
+var concat = require('gulp-concat');
 
 // default task - lint the js
 gulp.task('default', ['lint'], function() {
@@ -14,7 +15,7 @@ gulp.task('default', ['lint'], function() {
 });
 
 // build task
-gulp.task('build', ['compress', 'minify', 'sass', 'cssmin']);
+gulp.task('build', ['concat', 'compress', 'minify', 'sass', 'cssmin']);
 
 // zip up everything.
 // to be done last...
@@ -26,21 +27,27 @@ gulp.task('zip', function() {
 });
 
 // The background tasks
+gulp.task('concat', function() {
+  return gulp.src(['game.js', 'resources.js'])
+    .pipe(concat('compiled.js'))
+    .pipe(gulp.dest('./'))
+    //.pipe(concat('game.js'))
+    .pipe(gulp.dest('./release/src/'))
+});
+
 gulp.task('lint', function() {
-  return gulp.src(['./game.js'])
+  return gulp.src(['./*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());
 });
 
 gulp.task('compress', function() {
-  return gulp.src('./game.js')
-    // update the copy in the src folder
-    .pipe(gulp.dest('./release/src'))
+  return gulp.src('./compiled.js')
     // uglify the javascript
     .pipe(uglify())
     .pipe(size({ title: 'game.js'}))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('minify', function() {
@@ -50,7 +57,7 @@ gulp.task('minify', function() {
     // minify the HTML
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(size({ title: 'index.html' }))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('sass', function() {
@@ -64,5 +71,5 @@ gulp.task('cssmin', function() {
   return gulp.src('./styles.css')
     .pipe(cssmin())
     .pipe(size({ title: 'styles.css'}))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 });
