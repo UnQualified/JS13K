@@ -20,9 +20,32 @@ function game() {
   		playerOneHealth: 100,
   		playerTwoHealth: 100,
   		tossWinner: null,
-  		chosenAttack: null
+  		chosenAttack: null,
+  		defender: null
   };
   var MAXHEALTH = 10;
+  var powers = {
+  		water: { 
+  			type: 'water',
+  			speed: 2,
+  			damage: 30
+  		},
+  		fire: {
+  			type: 'fire',
+  			speed: 1,
+  			damage: 40
+  		},
+  		electric: {
+  			type: 'electric',
+  			speed: 3,
+  			damage: 15
+  		},
+  		special: {
+  			type: 'special',
+  			speed: 2,
+  			damage: 50
+  		}
+  };
 
   window.requestAnimationFrame(loop);
   window.addEventListener("keydown", function (event) {
@@ -31,41 +54,54 @@ function game() {
 	  		if (event.keyCode === keyStroke.currentLetter) {
 	  			availableKeys.keys[keyStroke.currentLetter - 65].available = true;
 	  			keyStroke.assignLetter(availableKeys.getKey());
-	  			p1.updateScore();
+	  			p1.updateScore(10);
 	  		}
 	  		// player 2
 	  		else if (event.keyCode === p2Keys.currentLetter) {
 	  			availableKeys.keys[p2Keys.currentLetter - 65].avaialble = true;
 	  			p2Keys.assignLetter(availableKeys.getKey());
-	  			p2.updateScore();
+	  			p2.updateScore(10);
 	  		}
+	  	}
+	  	else if (state.gameState === 'attackIncoming') {
+	  	  if (event.keyCode === keyStroke.currentLetter) {
+	  	    availableKeys.keys[keyStroke.currentLetter - 65].available = true;
+	  	    keyStroke.assignLetter(availableKeys.getKey());
+	  	    p1.updateScore(20);
+	  	  }
+	  	  else if (event.keyCode === p2Keys.currentLetter) {
+	  	    availableKeys.keys[p2Keys.currentLetter - 65].available = true;
+	  	    p2Keys.assignLetter(availableKeys.getKey());
+	  	    p2.updateScore(20);
+	  	  }
 	  	}
   		else if (state.gameState === 'attackSelection') {
 	  		if (attacks.available) {	  			
 	  			switch (event.keyCode) {
 	  				case 87:
+	  					alert('w');
 	  					selectedMsg = 'water';
 	  					attacks.available = false;
 	  					state.gameState = 'attack';
-	  					state.chosenAttack = 'water';
+	  					state.chosenAttack = powers.water; //'water';
 	  					break;
 	  				case 70:
 	  					selectedMsg = 'fire';
 	  					attacks.available = false;
 	  					state.gameState = 'attack';
-	  					state.chosenAttack = 'fire';
+	  					state.chosenAttack = powers.fire; //'fire';
 	  					break;
 	  				case 69:
 	  					selectedMsg = 'electric';
 	  					attacks.available = false;
 	  					state.gameState = 'attack';
-	  					state.chosenAttack = 'electric';
+	  					state.chosenAttack = powers.electric; //'electric';
 	  					break;
 	  				case 83:
 	  					selectedMsg = 'special';
 	  					attacks.available = false;
 	  					state.gameState = 'attack';
-	  					state.chosenAttack = 'special';
+	  					state.chosenAttack = powers.special; //'special';
 	  					break;
 	  			}
 	  		}
@@ -115,7 +151,7 @@ function game() {
 		}
 		else if (state.gameState == 'attack') {
 			ctx.textAlign = 'center';
-			var aMsg = 'player ' + state.tossWinner + ' does a ' + state.chosenAttack + ' attack';
+			var aMsg = 'player ' + state.tossWinner + ' does a ' + state.chosenAttack.type + ' attack';
 			ctx.fillText(aMsg, getCanvasCentre().x, getCanvasCentre().y);
 			frame++;
 			if (frame >= 120) {
@@ -125,20 +161,83 @@ function game() {
 		}
 		else if (state.gameState == 'defense') {
 			ctx.textAlign = 'center';
-			var defender = state.tossWinner === 1 ? 2 : 1;
-			ctx.fillText('player ' + defender + ', reverse it!', getCanvasCentre().x, getCanvasCentre().y);
+			state.defender = state.tossWinner === 1 ? 2 : 1;
+			ctx.fillText('player ' + state.defender + ', reverse it!', getCanvasCentre().x, getCanvasCentre().y);
 			frame++;
+			
 			if (frame >= 120) {
-				if (defender === 1) {
-					state.playerOneHealth -= 10; // this needs to be attack appropriate
+			  frame = 0;
+			  state.gameState = 'attackIncoming';
+			  p1.resetScore();
+			  p2.resetScore();
+			}
+		}
+		else if (state.gameState == 'attackIncoming') {					
+		  frame++;
+			var seconds = 60 / state.chosenAttack.speed * 10;
+			ctx.textAlign = 'center';
+			ctx.fillText(seconds + ' : ' + frame, getCanvasCentre().x, canvas.height - 50);
+			
+			switch (state.defender) {
+			  case 1:
+			      p1.draw(ctx);
+			      if (p1.getScore() >= 100) {
+			        p1.resetScore();
+			        p2.resetScore();
+			        state.playerTwoHealth -= state.chosenAttack.damage / 2;
+			        // add hit/reveresed state??
+			        state.gameState = 'toss';
+			      }
+			    break;
+			  case 2:
+			      p2.draw(ctx);
+			      if (p2.getScore() >= 100) {
+			        p1.resetScore();
+			        p2.resetScore();
+			        state.playerOneHealth -= state.chosenAttack.damage / 2;
+			        // add hit/reveresed state??
+			        state.gameState = 'toss';
+			      }
+			    break;
+			}
+			
+			if (frame >= seconds) {
+				if (state.defender === 1) {
+					state.playerOneHealth -= state.chosenAttack.damage;
+					if (state.playerOneHealth <= 0) {
+					  state.playerOneHealth = 0;
+					  state.gameState = 'gameOver';
+					}
 				}
 				else {
-					state.playerTwoHealth -= 10; // this needs to be attack appropriate
+					state.playerTwoHealth -= state.chosenAttack.damage;
+					if (state.playerTwoHealth <= 0) {
+					  state.playerTwoHealth = 0;
+					  state.gameState = 'gameOver';
+					}
 				}
+				
+				// @todo defence mechanics go here
+				// -------------------------------
+				
 				frame = 0;
-				state.gameState = 'toss';
+				if (state.gameState != 'gameOver') {
+				  state.gameState = 'toss';
+				}
 				p1.resetScore();
 				p2.resetScore();
+			}
+		}
+		else if (state.gameState == 'gameOver') {
+			var msg = state.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
+			msg += ' wins';
+			ctx.textAlign = 'center';
+			ctx.fillText(msg, getCanvasCentre().x, getCanvasCentre().y);
+			frame++;
+			if (frame >= 120) {
+				frame = 0;
+				state.gameState = 'toss';
+				state.playerOneHealth = state.playerTwoHealth = 100;
 			}
 		}
 		
@@ -163,7 +262,7 @@ function game() {
   				return score;
   			},
   			updateScore: function(inc) {
-  				score += 10;
+  				score += inc;
   			},
   			resetScore: function() {
   				score = 0;
