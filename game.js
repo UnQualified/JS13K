@@ -79,7 +79,6 @@ function game() {
 	  		if (attacks.available) {	  			
 	  			switch (event.keyCode) {
 	  				case 87:
-	  					alert('w');
 	  					selectedMsg = 'water';
 	  					attacks.available = false;
 	  					state.gameState = 'attack';
@@ -182,51 +181,93 @@ function game() {
 			  case 1:
 			      p1.draw(ctx);
 			      if (p1.getScore() >= 100) {
-			        p1.resetScore();
-			        p2.resetScore();
-			        state.playerTwoHealth -= state.chosenAttack.damage / 2;
-			        // add hit/reveresed state??
-			        state.gameState = 'toss';
+			        state.gameState = 'attackFail';
 			      }
 			    break;
 			  case 2:
 			      p2.draw(ctx);
 			      if (p2.getScore() >= 100) {
-			        p1.resetScore();
-			        p2.resetScore();
-			        state.playerOneHealth -= state.chosenAttack.damage / 2;
-			        // add hit/reveresed state??
-			        state.gameState = 'toss';
+			        state.gameState = 'attackFail';
 			      }
 			    break;
 			}
 			
 			if (frame >= seconds) {
-				if (state.defender === 1) {
-					state.playerOneHealth -= state.chosenAttack.damage;
-					if (state.playerOneHealth <= 0) {
-					  state.playerOneHealth = 0;
-					  state.gameState = 'gameOver';
-					}
-				}
-				else {
-					state.playerTwoHealth -= state.chosenAttack.damage;
-					if (state.playerTwoHealth <= 0) {
-					  state.playerTwoHealth = 0;
-					  state.gameState = 'gameOver';
-					}
-				}
+				//if (state.defender === 1) {
+				//	state.playerOneHealth -= state.chosenAttack.damage;
+				//	if (state.playerOneHealth <= 0) {
+				//	  state.playerOneHealth = 0;
+				//	  state.gameState = 'gameOver';
+				//	}
+				//	else {
+					  state.gameState = 'attackSuccess';
+				//	}
+				//}
+				//else {
+				//	state.playerTwoHealth -= state.chosenAttack.damage;
+				//	if (state.playerTwoHealth <= 0) {
+				//	  state.playerTwoHealth = 0;
+				//	  state.gameState = 'gameOver';
+				//	}
+				//	state.gameState = 'attackSuccess';
+				//}
 				
 				// @todo defence mechanics go here
 				// -------------------------------
 				
-				frame = 0;
-				if (state.gameState != 'gameOver') {
-				  state.gameState = 'toss';
-				}
-				p1.resetScore();
-				p2.resetScore();
+				//frame = 0;
+				//if (state.gameState != 'gameOver') {
+				//  state.gameState = 'toss';
+				//}
+				//p1.resetScore();
+				//p2.resetScore();
 			}
+		}
+		else if (state.gameState == 'attackFail') {
+		  p1.resetScore();
+		  p2.resetScore();
+		  frame = 0;
+		  if (state.defender === 1) {
+		    state.playerTwoHealth -= state.chosenAttack.damage / 2;
+		    if (state.playerTwoHealth <= 0) {
+		      state.playerTwoHealth = 0;
+		      state.gameState = 'gameOver';
+		    }
+		    else {
+		      state.gameState = 'toss';
+		    }
+		  }
+		  else {
+		    state.playerOneHealth -= state.chosenAttack.damage / 2;
+		    if (state.playerOneHealth <= 0) {
+		      state.playerOneHealth = 0;
+		      state.gameState = 'gameOver';
+		    }
+		    else {
+		      state.gameState = 'toss';
+		    }
+		  }
+		}
+		else if (state.gameState == 'attackSuccess') {
+			if (state.defender === 1) {
+			  state.playerOneHealth -= state.chosenAttack.damage;
+			  if (state.playerOneHealth <= 0) {
+			    state.playerOneHealth = 0;
+			    state.gameState = 'gameOver';
+			  }
+			}
+			else {
+			  state.playerTwoHealth -= state.chosenAttack.damage;
+			  if (state.playerTwoHealth <= 0) {
+			    state.playerTwoHealth = 0;
+			    state.gameState = 'gameOver';
+			  }
+			}
+			
+			state.gameState = 'toss';
+			frame = 0;
+			p1.resetScore();
+			p2.resetScore();
 		}
 		else if (state.gameState == 'gameOver') {
 			var msg = state.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
