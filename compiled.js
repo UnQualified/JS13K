@@ -4,6 +4,7 @@ function game() {
   var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 400;
+  var centre = getCanvasCentre();
 
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
@@ -11,11 +12,10 @@ function game() {
   var p1 = player(10, 20, keyStroke);
   var p2 = player(100, 20, p2Keys);
   var attacks = new Attack(ctx);
-  var selectedMsg = null;
 
   var frame = 0;
-  var state = {
-  		gameState: 'toss',
+  var _game = {
+  		state: 'toss',
   		attackingPlayer: null,
   		playerOneHealth: 100,
   		playerTwoHealth: 100,
@@ -23,7 +23,8 @@ function game() {
   		chosenAttack: null,
   		defender: null
   };
-  var MAXHEALTH = 10;
+  var MAXHEALTH = 100;
+  var DEBUGHEALTH = 10;
   var powers = {
   		water: {
   			type: 'water',
@@ -49,7 +50,7 @@ function game() {
 
   window.requestAnimationFrame(loop);
   window.addEventListener("keydown", function (event) {
-  		if (state.gameState === 'toss') {
+  		if (_game.state === 'toss') {
 	  		// player 1
 	  		if (event.keyCode === keyStroke.currentLetter) {
 	  			availableKeys.keys[keyStroke.currentLetter - 65].available = true;
@@ -63,7 +64,7 @@ function game() {
 	  			p2.updateScore(10);
 	  		}
 	  	}
-	  	else if (state.gameState === 'attackIncoming') {
+	  	else if (_game.state === 'attackIncoming') {
 	  	  if (event.keyCode === keyStroke.currentLetter) {
 	  	    availableKeys.keys[keyStroke.currentLetter - 65].available = true;
 	  	    keyStroke.assignLetter(availableKeys.getKey());
@@ -75,32 +76,28 @@ function game() {
 	  	    p2.updateScore(20);
 	  	  }
 	  	}
-  		else if (state.gameState === 'attackSelection') {
+  		else if (_game.state === 'attackSelection') {
 	  		if (attacks.available) {
 	  			switch (event.keyCode) {
 	  				case 87:
-	  					selectedMsg = 'water';
 	  					attacks.available = false;
-	  					state.gameState = 'attack';
-	  					state.chosenAttack = powers.water; //'water';
+	  					_game.state = 'attack';
+	  					_game.chosenAttack = powers.water;
 	  					break;
 	  				case 70:
-	  					selectedMsg = 'fire';
 	  					attacks.available = false;
-	  					state.gameState = 'attack';
-	  					state.chosenAttack = powers.fire; //'fire';
+	  					_game.state = 'attack';
+	  					_game.chosenAttack = powers.fire;
 	  					break;
 	  				case 69:
-	  					selectedMsg = 'electric';
 	  					attacks.available = false;
-	  					state.gameState = 'attack';
-	  					state.chosenAttack = powers.electric; //'electric';
+	  					_game.state = 'attack';
+	  					_game.chosenAttack = powers.electric;
 	  					break;
 	  				case 83:
-	  					selectedMsg = 'special';
 	  					attacks.available = false;
-	  					state.gameState = 'attack';
-	  					state.chosenAttack = powers.special; //'special';
+	  					_game.state = 'attack';
+	  					_game.chosenAttack = powers.special;
 	  					break;
 	  			}
 	  		}
@@ -109,13 +106,12 @@ function game() {
 
   function loop() {
   		clear();
-  		ctx.textAlign = 'left';
-  		ctx.fillText(state.gameState, canvas.width - 200, 20);
-  		ctx.fillText('player 1: ' + state.playerOneHealth, 10, canvas.height - 50);
-  		ctx.fillText('player 2: ' + state.playerTwoHealth, canvas.width - 200, canvas.height - 50);
+      text(_game.state, canvas.width - 200, 20, 'left');
+      text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
+      text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
 
-  		if (state.gameState === 'toss') {
-	  		if (p1.getScore() < MAXHEALTH && p2.getScore() < MAXHEALTH) {
+  		if (_game.state === 'toss') {
+	  		if (p1.getScore() < DEBUGHEALTH && p2.getScore() < DEBUGHEALTH) {
 				p1.draw(ctx);
 				p2.draw(ctx);
 			}
@@ -123,8 +119,8 @@ function game() {
 				var winner = '';
 				if (frame < 120) {
 					frame++;
-					winner = p1.getScore() >= MAXHEALTH ? 'player one' : 'player two';
-					state.tossWinner = p1.getScore() >= MAXHEALTH ? 1 : 2;
+					winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
+					_game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
 					winner += ' has the power';
 				}
 				else if (frame < 240) {
@@ -134,161 +130,114 @@ function game() {
 				else {
 					winner = null;
 				}
-				ctx.textAlign = 'center';
 				if (winner !== null) {
-					ctx.fillText(winner, getCanvasCentre().x, getCanvasCentre().y);
+          text(winner, centre.x, centre.y, 'center');
 				}
 				else {
-					state.gameState = 'attackSelection';
+					_game.state = 'attackSelection';
 				}
 			}
 		}
-		else if (state.gameState == 'attackSelection') {
-			attacks.displayAttacks(getCanvasCentre());
-			attacks.selectedAttack(selectedMsg);
-			frame = 0;
+		else if (_game.state == 'attackSelection') {
+			attacks.displayAttacks(centre);
+			reset();
 		}
-		else if (state.gameState == 'attack') {
-			ctx.textAlign = 'center';
-			var aMsg = 'player ' + state.tossWinner + ' does a ' + state.chosenAttack.type + ' attack';
-			ctx.fillText(aMsg, getCanvasCentre().x, getCanvasCentre().y);
+		else if (_game.state == 'attack') {
+			var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
+      text(aMsg, centre.x, centre.y, 'center');
 			frame++;
 			if (frame >= 120) {
-				state.gameState = 'defense';
-				frame = 0;
+				reset({state:'defense'});
 			}
 		}
-		else if (state.gameState == 'defense') {
-			ctx.textAlign = 'center';
-			state.defender = state.tossWinner === 1 ? 2 : 1;
-			ctx.fillText('player ' + state.defender + ', reverse it!', getCanvasCentre().x, getCanvasCentre().y);
+		else if (_game.state == 'defense') {
+			_game.defender = _game.tossWinner === 1 ? 2 : 1;
+      text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
 			frame++;
 
 			if (frame >= 120) {
-			  frame = 0;
-			  state.gameState = 'attackIncoming';
-			  p1.resetScore();
-			  p2.resetScore();
+        reset({state:'attackIncoming'});
 			}
 		}
-		else if (state.gameState == 'attackIncoming') {
+		else if (_game.state == 'attackIncoming') {
 		  frame++;
-			var seconds = 60 / state.chosenAttack.speed * 10;
-			ctx.textAlign = 'center';
-			ctx.fillText(seconds + ' : ' + frame, getCanvasCentre().x, canvas.height - 50);
+			var seconds = 60 / _game.chosenAttack.speed * 10;
+      text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
 
-			switch (state.defender) {
+			switch (_game.defender) {
 			  case 1:
 			      p1.draw(ctx);
 			      if (p1.getScore() >= 100) {
-			        state.gameState = 'attackFail';
+			        _game.state = 'attackFail';
 			      }
 			    break;
 			  case 2:
 			      p2.draw(ctx);
 			      if (p2.getScore() >= 100) {
-			        state.gameState = 'attackFail';
+			        _game.state = 'attackFail';
 			      }
 			    break;
 			}
 
 			if (frame >= seconds) {
-				//if (state.defender === 1) {
-				//	state.playerOneHealth -= state.chosenAttack.damage;
-				//	if (state.playerOneHealth <= 0) {
-				//	  state.playerOneHealth = 0;
-				//	  state.gameState = 'gameOver';
-				//	}
-				//	else {
-					  state.gameState = 'attackSuccess';
-				//	}
-				//}
-				//else {
-				//	state.playerTwoHealth -= state.chosenAttack.damage;
-				//	if (state.playerTwoHealth <= 0) {
-				//	  state.playerTwoHealth = 0;
-				//	  state.gameState = 'gameOver';
-				//	}
-				//	state.gameState = 'attackSuccess';
-				//}
-
-				// @todo defence mechanics go here
-				// -------------------------------
-
-				//frame = 0;
-				//if (state.gameState != 'gameOver') {
-				//  state.gameState = 'toss';
-				//}
-				//p1.resetScore();
-				//p2.resetScore();
+        _game.state = 'attackSuccess';
 			}
 		}
-		else if (state.gameState == 'attackFail') {
-		  p1.resetScore();
-		  p2.resetScore();
-		  frame = 0;
-		  if (state.defender === 1) {
-		    state.playerTwoHealth -= state.chosenAttack.damage / 2;
-		    if (state.playerTwoHealth <= 0) {
-		      state.playerTwoHealth = 0;
-		      state.gameState = 'gameOver';
+		else if (_game.state == 'attackFail') {
+      reset();
+		  if (_game.defender === 1) {
+		    _game.playerTwoHealth -= _game.chosenAttack.damage / 2;
+		    if (_game.playerTwoHealth <= 0) {
+		      _game.playerTwoHealth = 0;
+          reset({state:'gameOver'});
 		    }
 		    else {
-		      state.gameState = 'toss';
+		      _game.state = 'toss';
 		    }
 		  }
 		  else {
-		    state.playerOneHealth -= state.chosenAttack.damage / 2;
-		    if (state.playerOneHealth <= 0) {
-		      state.playerOneHealth = 0;
-		      state.gameState = 'gameOver';
+		    _game.playerOneHealth -= _game.chosenAttack.damage / 2;
+		    if (_game.playerOneHealth <= 0) {
+		      _game.playerOneHealth = 0;
+		      _game.state = 'gameOver';
 		    }
 		    else {
-		      state.gameState = 'toss';
+		      _game.state = 'toss';
 		    }
 		  }
 		}
-		else if (state.gameState == 'attackSuccess') {
+		else if (_game.state == 'attackSuccess') {
       var _continue = true;
-			if (state.defender === 1) {
-			  state.playerOneHealth -= state.chosenAttack.damage;
-			  if (state.playerOneHealth <= 0) {
-          console.log('gameOver');
-			    state.playerOneHealth = 0;
-			    state.gameState = 'gameOver';
+			if (_game.defender === 1) {
+			  _game.playerOneHealth -= _game.chosenAttack.damage;
+			  if (_game.playerOneHealth <= 0) {
+			    _game.playerOneHealth = 0;
+			    _game.state = 'gameOver';
           frame = 0;
           _continue = false;
 			  }
 			}
 			else {
-			  state.playerTwoHealth -= state.chosenAttack.damage;
-			  if (state.playerTwoHealth <= 0) {
-          console.log('gameOver');
-			    state.playerTwoHealth = 0;
-			    state.gameState = 'gameOver';
+			  _game.playerTwoHealth -= _game.chosenAttack.damage;
+			  if (_game.playerTwoHealth <= 0) {
+			    _game.playerTwoHealth = 0;
+			    _game.state = 'gameOver';
           frame = 0;
           _continue = false;
 			  }
 			}
 
       if (_continue) {
-  			state.gameState = 'toss';
-  			frame = 0;
-  			p1.resetScore();
-  			p2.resetScore();
+        reset({state:'toss'});
       }
 		}
-		else if (state.gameState == 'gameOver') {
-      console.log('gameOver state achieved');
-			var msg = state.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
+		else if (_game.state == 'gameOver') {
+			var msg = _game.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
 			msg += ' wins';
-			ctx.textAlign = 'center';
-			ctx.fillText(msg, getCanvasCentre().x, getCanvasCentre().y);
+      text(msg, centre.x, centre.y, 'center');
 			frame++;
 			if (frame >= 120) {
-				frame = 0;
-				state.gameState = 'toss';
-				state.playerOneHealth = state.playerTwoHealth = 100;
+        reset({state:'toss',health:true});
 			}
 		}
 
@@ -326,11 +275,29 @@ function game() {
   		return {
   			x: canvas.width / 2,
   			y: canvas.height / 2
-  		}
+  		};
   }
 
-  function doAttack(player, attack) {
+  function reset(options) {
+    frame = 0;
+    p1.resetScore();
+    p2.resetScore();
+    if (options === undefined) {
+      return;
+    }
+    if (options.health !== undefined) {
+      _game.playerOneHealth = _game.playerTwoHealth = MAXHEALTH;
+    }
+    if (options.state !== undefined) {
+      _game.state = options.state;
+    }
+  }
 
+  function text(msg, x, y, align) {
+    if (align !== undefined) {
+      ctx.textAlign = align;
+    }
+    ctx.fillText(msg, x, y);
   }
 }
 
