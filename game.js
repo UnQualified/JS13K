@@ -4,7 +4,7 @@ function game() {
   var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 400;
-  
+
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
   var p2Keys = new KeyStroke(availableKeys.getKey());
@@ -12,7 +12,7 @@ function game() {
   var p2 = player(100, 20, p2Keys);
   var attacks = new Attack(ctx);
   var selectedMsg = null;
-  
+
   var frame = 0;
   var state = {
   		gameState: 'toss',
@@ -25,7 +25,7 @@ function game() {
   };
   var MAXHEALTH = 10;
   var powers = {
-  		water: { 
+  		water: {
   			type: 'water',
   			speed: 2,
   			damage: 30
@@ -76,7 +76,7 @@ function game() {
 	  	  }
 	  	}
   		else if (state.gameState === 'attackSelection') {
-	  		if (attacks.available) {	  			
+	  		if (attacks.available) {
 	  			switch (event.keyCode) {
 	  				case 87:
 	  					selectedMsg = 'water';
@@ -106,14 +106,14 @@ function game() {
 	  		}
   		}
   });
-  
+
   function loop() {
   		clear();
   		ctx.textAlign = 'left';
   		ctx.fillText(state.gameState, canvas.width - 200, 20);
   		ctx.fillText('player 1: ' + state.playerOneHealth, 10, canvas.height - 50);
   		ctx.fillText('player 2: ' + state.playerTwoHealth, canvas.width - 200, canvas.height - 50);
-  		
+
   		if (state.gameState === 'toss') {
 	  		if (p1.getScore() < MAXHEALTH && p2.getScore() < MAXHEALTH) {
 				p1.draw(ctx);
@@ -163,7 +163,7 @@ function game() {
 			state.defender = state.tossWinner === 1 ? 2 : 1;
 			ctx.fillText('player ' + state.defender + ', reverse it!', getCanvasCentre().x, getCanvasCentre().y);
 			frame++;
-			
+
 			if (frame >= 120) {
 			  frame = 0;
 			  state.gameState = 'attackIncoming';
@@ -171,12 +171,12 @@ function game() {
 			  p2.resetScore();
 			}
 		}
-		else if (state.gameState == 'attackIncoming') {					
+		else if (state.gameState == 'attackIncoming') {
 		  frame++;
 			var seconds = 60 / state.chosenAttack.speed * 10;
 			ctx.textAlign = 'center';
 			ctx.fillText(seconds + ' : ' + frame, getCanvasCentre().x, canvas.height - 50);
-			
+
 			switch (state.defender) {
 			  case 1:
 			      p1.draw(ctx);
@@ -191,7 +191,7 @@ function game() {
 			      }
 			    break;
 			}
-			
+
 			if (frame >= seconds) {
 				//if (state.defender === 1) {
 				//	state.playerOneHealth -= state.chosenAttack.damage;
@@ -211,10 +211,10 @@ function game() {
 				//	}
 				//	state.gameState = 'attackSuccess';
 				//}
-				
+
 				// @todo defence mechanics go here
 				// -------------------------------
-				
+
 				//frame = 0;
 				//if (state.gameState != 'gameOver') {
 				//  state.gameState = 'toss';
@@ -249,11 +249,14 @@ function game() {
 		  }
 		}
 		else if (state.gameState == 'attackSuccess') {
+      var _continue = true;
 			if (state.defender === 1) {
 			  state.playerOneHealth -= state.chosenAttack.damage;
 			  if (state.playerOneHealth <= 0) {
 			    state.playerOneHealth = 0;
 			    state.gameState = 'gameOver';
+          frame = 0;
+          _continue = false;
 			  }
 			}
 			else {
@@ -261,13 +264,17 @@ function game() {
 			  if (state.playerTwoHealth <= 0) {
 			    state.playerTwoHealth = 0;
 			    state.gameState = 'gameOver';
+          frame = 0;
+          _continue = false;
 			  }
 			}
-			
-			state.gameState = 'toss';
-			frame = 0;
-			p1.resetScore();
-			p2.resetScore();
+
+      if (_continue) {
+  			state.gameState = 'toss';
+  			frame = 0;
+  			p1.resetScore();
+  			p2.resetScore();
+      }
 		}
 		else if (state.gameState == 'gameOver') {
 			var msg = state.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
@@ -281,19 +288,19 @@ function game() {
 				state.playerOneHealth = state.playerTwoHealth = 100;
 			}
 		}
-		
+
 		window.requestAnimationFrame(loop);
   }
-  
+
   function clear() {
   		ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
-  
+
   function player(x, y, _keystroke) {
   		var score = 0;
-  		
+
   		ctx.font = '22px sans-serif';
-  		  		
+
   		return {
   			draw: function() {
   				ctx.fillText(_keystroke.getLetter(), x, y);
@@ -309,17 +316,17 @@ function game() {
   				score = 0;
   			}
   		};
-  		
+
   }
-  
+
   function getCanvasCentre() {
   		return {
   			x: canvas.width / 2,
   			y: canvas.height / 2
   		}
   }
-  
+
   function doAttack(player, attack) {
-  
+
   }
 }
