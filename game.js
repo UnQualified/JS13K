@@ -2,18 +2,15 @@ function game() {
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
-  canvas.width = 960; //800;
-  canvas.height = 540; //400;
+  canvas.width = 960;
+  canvas.height = 540;
   var centre = getCanvasCentre();
-
-  // centre the canvas
-  canvas.top = '100px';
 
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
   var p2Keys = new KeyStroke(availableKeys.getKey());
-  var p1 = player(10, 20, keyStroke);
-  var p2 = player(100, 20, p2Keys);
+  var p1 = player(240, canvas.height / 2 + 100, keyStroke);
+  var p2 = player(720, canvas.height / 2 + 100, p2Keys);
   var attacks = new Attack(ctx);
 
   var frame = 0;
@@ -28,7 +25,7 @@ function game() {
   		start: false
   };
   var MAXHEALTH = 100;
-  var DEBUGHEALTH = 10;
+  var DEBUGHEALTH = 50;
   var powers = {
   		water: {
   			type: 'water',
@@ -56,7 +53,6 @@ function game() {
   window.addEventListener("keydown", function (event) {
     if (_game.state === 'menu') {
       if (event.keyCode === 32) {
-        //alert('space pressed');
         _game.start = true;
       }
     }
@@ -126,9 +122,9 @@ function game() {
       text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
     }
     else {
-      ctx.font = '52px sans-serif';
-      text('GAME TITLE', centre.x, centre.y - 50, 'center');
-      ctx.font = '22px sans-serif';
+      //ctx.font = '52px sans-serif';
+      text('GAME TITLE', centre.x, centre.y - 50, 'center', '52px');
+      //ctx.font = '22px sans-serif';
       text('press [space] to start', centre.x, centre.y + 20, 'center');
       if (_game.start) {
         _game.state = 'toss';
@@ -192,13 +188,13 @@ function game() {
 
       switch (_game.defender) {
         case 1:
-          p1.draw(ctx);
+          //p1.draw(ctx);
           if (p1.getScore() >= 100) {
             _game.state = 'attackFail';
           }
           break;
           case 2:
-            p2.draw(ctx);
+            //p2.draw(ctx);
             if (p2.getScore() >= 100) {
               _game.state = 'attackFail';
             }
@@ -279,12 +275,13 @@ function game() {
   function player(x, y, _keystroke) {
   		var score = 0;
 
-  		ctx.font = '22px sans-serif';
+  		//ctx.font = '100px sans-serif';
 
   		return {
   			draw: function() {
-  				ctx.fillText(_keystroke.getLetter(), x, y);
-  				ctx.fillText(score, x, y + 50);
+          ctx.fillStyle = 'rgba(0,0,0,0.75)';
+          text(_keystroke.getLetter(), x, y, 'center', '400px');
+          ctx.fillStyle = 'rgb(0,0,0)';
   			},
   			getScore: function() {
   				return score;
@@ -321,10 +318,11 @@ function game() {
     }
   }
 
-  function text(msg, x, y, align) {
+  function text(msg, x, y, align, size) {
     if (align !== undefined) {
       ctx.textAlign = align;
     }
+    ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
     ctx.fillText(msg, x, y);
   }
 
