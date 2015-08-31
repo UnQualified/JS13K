@@ -2,9 +2,12 @@ function game() {
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
-  canvas.width = 800;
-  canvas.height = 400;
+  canvas.width = 960; //800;
+  canvas.height = 540; //400;
   var centre = getCanvasCentre();
+
+  // centre the canvas
+  canvas.top = '100px';
 
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
@@ -113,7 +116,11 @@ function game() {
 
   function loop() {
     clear();
-      if (_game.state !== 'menu') {
+    draw();
+
+    // logic
+    ctx.fillStyle = 'black';
+    if (_game.state !== 'menu') {
       text(_game.state, canvas.width - 200, 20, 'left');
       text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
       text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
@@ -148,7 +155,7 @@ function game() {
         else {
           winner = null;
         }
-        
+
         if (winner !== null) {
           text(winner, centre.x, centre.y, 'center');
         }
@@ -173,7 +180,7 @@ function game() {
       _game.defender = _game.tossWinner === 1 ? 2 : 1;
       text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
       frame++;
-      
+
       if (frame >= 120) {
         reset({state:'attackIncoming'});
       }
@@ -262,7 +269,7 @@ function game() {
     }
 
     window.requestAnimationFrame(loop);
-    
+
   }
 
   function clear() {
@@ -319,5 +326,11 @@ function game() {
       ctx.textAlign = align;
     }
     ctx.fillText(msg, x, y);
+  }
+
+  function draw() {
+    backgroundOne(ctx);
+    backgroundTwo(ctx);
+    sun(ctx);
   }
 }
