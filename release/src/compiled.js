@@ -4,6 +4,7 @@ function game() {
   var ctx = canvas.getContext('2d');
   canvas.width = 960;
   canvas.height = 540;
+  //canvas.style.backgroundColor = 'rgb(0,0,0)';
   var centre = getCanvasCentre();
 
   var availableKeys = new AvailableKeys();
@@ -279,9 +280,9 @@ function game() {
 
   		return {
   			draw: function() {
-          ctx.fillStyle = 'rgba(0,0,0,0.75)';
+          ctx.fillStyle = 'rgba(240,240,240,0.75)';
           text(_keystroke.getLetter(), x, y, 'center', '400px');
-          ctx.fillStyle = 'rgb(0,0,0)';
+          ctx.fillStyle = 'rgb(255,255,255)';
   			},
   			getScore: function() {
   				return score;
