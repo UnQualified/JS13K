@@ -103,6 +103,23 @@ function ground(ctx, x, y) {
   };
 }
 
+function water(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    height: 70,
+    draw: function() {
+      var grad = ctx.createLinearGradient(480,420,480,490);
+      grad.addColorStop(0, 'rgb(0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.rect(this.x, this.y, canvas.width, this.height);
+      ctx.fill();
+      ctx.fillStyle = 'black';
+    }
+  };
+}
+
 function playerSprite(ctx, x, y, number) {
   var dir = number === 2 ? -1 : 1;
   return {

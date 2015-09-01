@@ -348,6 +348,7 @@ function game() {
     var g = ground(ctx, 0, 400);
     var ps1 = playerSprite(ctx, 150, g.y - 30);
     var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
+    var w = water(ctx, 0, 420);
     
     // stars
     sprites.stars.forEach(function (s) {
@@ -356,10 +357,13 @@ function game() {
     
     m.draw();
     g.draw();
+
     ps1.draw();
     ps1.drawReflection();
     
     ps2.draw();
     ps2.drawReflection();
+    
+    w.draw();
   }
 }
