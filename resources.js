@@ -66,6 +66,31 @@ function moon(ctx, x, y) {
   };
 }
 
+function star(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    radius: rnd(1,3),
+    draw: function() {
+      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+}
+
+function starField(ctx, num) {
+  var stars = [];
+  for (var i = 0; i < num; i++) {
+    var x = rnd(0, 960);
+    var y = rnd(0, 540);
+    stars.push(star(ctx, x, y));
+  }
+  return stars;
+}
+
 function ground(ctx, x, y) {
   return {
     x: x,

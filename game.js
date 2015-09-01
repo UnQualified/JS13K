@@ -49,6 +49,10 @@ function game() {
   			damage: 50
   		}
   };
+  
+  var sprites = {
+    stars: starField(ctx, 30)
+  };
 
   window.requestAnimationFrame(loop);
   window.addEventListener("keydown", function (event) {
@@ -338,10 +342,17 @@ function game() {
   function draw() {
     //backgroundOne(ctx);
     //backgroundTwo(ctx);
+    
+    // THESE SHOULD BE DECLARED AS VARIABLES OUTSIDE THE LOOP    
     var m = moon(ctx, 800, 100);
     var g = ground(ctx, 0, 400);
     var ps1 = playerSprite(ctx, 150, g.y - 30);
     var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
+    
+    // stars
+    sprites.stars.forEach(function (s) {
+      s.draw();
+    });
     
     m.draw();
     g.draw();
