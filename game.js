@@ -341,10 +341,14 @@ function game() {
     var m = moon(ctx, 800, 100);
     var g = ground(ctx, 0, 400);
     var ps1 = playerSprite(ctx, 150, g.y - 30);
+    var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
     
     m.draw();
     g.draw();
     ps1.draw();
     ps1.drawReflection();
+    
+    ps2.draw();
+    ps2.drawReflection();
   }
 }

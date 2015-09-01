@@ -78,7 +78,8 @@ function ground(ctx, x, y) {
   };
 }
 
-function playerSprite(ctx, x, y) {
+function playerSprite(ctx, x, y, number) {
+  var dir = number === 2 ? -1 : 1;
   return {
     x: x,
     y: y,
@@ -87,30 +88,30 @@ function playerSprite(ctx, x, y) {
       // body
       ctx.fillStyle = 'rgb(255,255,255)';
       p.moveTo(this.x, this.y);
-      p.lineTo(this.x - 40, this.y);
-      p.lineTo(this.x - 10, this.y - 100);
-      p.lineTo(this.x + 20, this.y - 100);
-      p.lineTo(this.x + 30, this.y);
+      p.lineTo(this.x - (40 * dir), this.y);
+      p.lineTo(this.x - (10 * dir), this.y - 100);
+      p.lineTo(this.x + (20 * dir), this.y - 100);
+      p.lineTo(this.x + (30 * dir), this.y);
       // left leg
-      p.moveTo(this.x - 10, this.y);
-      p.lineTo(this.x - 12, this.y + 30);
-      p.lineTo(this.x - 20, this.y + 30);
-      p.lineTo(this.x - 18, this.y);
+      p.moveTo(this.x - (10 * dir), this.y);
+      p.lineTo(this.x - (12 * dir), this.y + 30);
+      p.lineTo(this.x - (20 * dir), this.y + 30);
+      p.lineTo(this.x - (18 * dir), this.y);
       // right leg
-      p.moveTo(this.x + 15, this.y);
-      p.lineTo(this.x + 15, this.y + 30);
-      p.lineTo(this.x + 7, this.y + 30);
-      p.lineTo(this.x + 7, this.y);
+      p.moveTo(this.x + (15 * dir), this.y);
+      p.lineTo(this.x + (15 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y);
       
       ctx.fill(p);
       
       // hood
       var h = new Path2D();
       ctx.fillStyle = 'rgb(40,40,40)';
-      h.moveTo(this.x + 17, this.y - 98);
-      h.lineTo(this.x + 19, this.y - 75);
-      h.lineTo(this.x + 4, this.y - 75);
-      h.lineTo(this.x + 9, this.y - 98);
+      h.moveTo(this.x + (17 * dir), this.y - 98);
+      h.lineTo(this.x + (19 * dir), this.y - 75);
+      h.lineTo(this.x + (4 * dir), this.y - 75);
+      h.lineTo(this.x + (9 * dir), this.y - 98);
       ctx.fill(h);
     },
     drawReflection: function() {
@@ -120,30 +121,30 @@ function playerSprite(ctx, x, y) {
       ctx.scale(1, -1);
       ctx.fillStyle = 'rgb(255,255,255)';
       p.moveTo(this.x, this.y);
-      p.lineTo(this.x - 40, this.y);
-      p.lineTo(this.x - 10, this.y - 100);
-      p.lineTo(this.x + 20, this.y - 100);
-      p.lineTo(this.x + 30, this.y);
+      p.lineTo(this.x - (40 * dir), this.y);
+      p.lineTo(this.x - (10 * dir), this.y - 100);
+      p.lineTo(this.x + (20 * dir), this.y - 100);
+      p.lineTo(this.x + (30 * dir), this.y);
       // left leg
-      p.moveTo(this.x - 10, this.y);
-      p.lineTo(this.x - 12, this.y + 30);
-      p.lineTo(this.x - 20, this.y + 30);
-      p.lineTo(this.x - 18, this.y);
+      p.moveTo(this.x - (10 * dir), this.y);
+      p.lineTo(this.x - (12 * dir), this.y + 30);
+      p.lineTo(this.x - (20 * dir), this.y + 30);
+      p.lineTo(this.x - (18 * dir), this.y);
       // right leg
-      p.moveTo(this.x + 15, this.y);
-      p.lineTo(this.x + 15, this.y + 30);
-      p.lineTo(this.x + 7, this.y + 30);
-      p.lineTo(this.x + 7, this.y);
+      p.moveTo(this.x + (15 * dir), this.y);
+      p.lineTo(this.x + (15 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y);
       
       ctx.fill(p);
       
       // hood
       var h = new Path2D();
       ctx.fillStyle = 'rgb(40,40,40)';
-      h.moveTo(this.x + 17, this.y - 98);
-      h.lineTo(this.x + 19, this.y - 75);
-      h.lineTo(this.x + 4, this.y - 75);
-      h.lineTo(this.x + 9, this.y - 98);
+      h.moveTo(this.x + (17 * dir), this.y - 98);
+      h.lineTo(this.x + (19 * dir), this.y - 75);
+      h.lineTo(this.x + (4 * dir), this.y - 75);
+      h.lineTo(this.x + (9 * dir), this.y - 98);
       ctx.fill(h);
       
       ctx.setTransform(1, 0, 0, 1, 0, 0);
