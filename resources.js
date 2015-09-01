@@ -43,12 +43,113 @@ function backgroundTwo(ctx) {
 	ctx.fill(p);
 }
 
-function sun(ctx) {
-	ctx.fillStyle = 'rgb(230,230,230)';
-	ctx.beginPath();
-	ctx.arc(800, 50, 40, 0, Math.PI * 2, true);
-	ctx.closePath();
-	ctx.fill();
+function moon(ctx, x, y) {  
+  return {
+    x: x,
+    y: y,
+    radius: 40,
+    draw: function() {
+      // bright side
+      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+      
+      // dark side
+      ctx.fillStyle = 'rgb(0,0,0)';
+      ctx.beginPath();
+      ctx.arc(this.x + 10, this.y - 10, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    }
+  };
+}
+
+function ground(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    height: 20,
+    draw: function() {
+      ctx.fillStyle = 'rgb(99,99,99)';
+      ctx.fillRect(this.x, this.y, canvas.width, this.height);
+    }
+  };
+}
+
+function playerSprite(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    draw: function() {
+      var p = new Path2D();
+      // body
+      ctx.fillStyle = 'rgb(255,255,255)';
+      p.moveTo(this.x, this.y);
+      p.lineTo(this.x - 40, this.y);
+      p.lineTo(this.x - 10, this.y - 100);
+      p.lineTo(this.x + 20, this.y - 100);
+      p.lineTo(this.x + 30, this.y);
+      // left leg
+      p.moveTo(this.x - 10, this.y);
+      p.lineTo(this.x - 12, this.y + 30);
+      p.lineTo(this.x - 20, this.y + 30);
+      p.lineTo(this.x - 18, this.y);
+      // right leg
+      p.moveTo(this.x + 15, this.y);
+      p.lineTo(this.x + 15, this.y + 30);
+      p.lineTo(this.x + 7, this.y + 30);
+      p.lineTo(this.x + 7, this.y);
+      
+      ctx.fill(p);
+      
+      // hood
+      var h = new Path2D();
+      ctx.fillStyle = 'rgb(40,40,40)';
+      h.moveTo(this.x + 17, this.y - 98);
+      h.lineTo(this.x + 19, this.y - 75);
+      h.lineTo(this.x + 4, this.y - 75);
+      h.lineTo(this.x + 9, this.y - 98);
+      ctx.fill(h);
+    },
+    drawReflection: function() {
+      var p = new Path2D();
+      // body
+      ctx.translate(400, 400);
+      ctx.scale(1, -1);
+      ctx.fillStyle = 'rgb(255,255,255)';
+      p.moveTo(this.x, this.y);
+      p.lineTo(this.x - 40, this.y);
+      p.lineTo(this.x - 10, this.y - 100);
+      p.lineTo(this.x + 20, this.y - 100);
+      p.lineTo(this.x + 30, this.y);
+      // left leg
+      p.moveTo(this.x - 10, this.y);
+      p.lineTo(this.x - 12, this.y + 30);
+      p.lineTo(this.x - 20, this.y + 30);
+      p.lineTo(this.x - 18, this.y);
+      // right leg
+      p.moveTo(this.x + 15, this.y);
+      p.lineTo(this.x + 15, this.y + 30);
+      p.lineTo(this.x + 7, this.y + 30);
+      p.lineTo(this.x + 7, this.y);
+      
+      ctx.fill(p);
+      
+      // hood
+      var h = new Path2D();
+      ctx.fillStyle = 'rgb(40,40,40)';
+      h.moveTo(this.x + 17, this.y - 98);
+      h.lineTo(this.x + 19, this.y - 75);
+      h.lineTo(this.x + 4, this.y - 75);
+      h.lineTo(this.x + 9, this.y - 98);
+      ctx.fill(h);
+      
+      ctx.translate(0,0);
+      ctx.scale(1,1);
+    }
+  }
 }
 
 function rnd(min, max) {

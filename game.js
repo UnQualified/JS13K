@@ -323,13 +323,21 @@ function game() {
     if (align !== undefined) {
       ctx.textAlign = align;
     }
+    ctx.fillStyle = 'rgb(255,255,255)';
     ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
     ctx.fillText(msg, x, y);
   }
 
   function draw() {
-    backgroundOne(ctx);
-    backgroundTwo(ctx);
-    sun(ctx);
+    //backgroundOne(ctx);
+    //backgroundTwo(ctx);
+    var m = moon(ctx, 800, 100);
+    var g = ground(ctx, 0, 400);
+    var ps1 = playerSprite(ctx, 150, g.y - 30);
+    
+    m.draw();
+    g.draw();
+    ps1.draw();
+    //ps1.drawReflection();
   }
 }
