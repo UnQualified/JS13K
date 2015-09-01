@@ -116,7 +116,7 @@ function playerSprite(ctx, x, y) {
     drawReflection: function() {
       var p = new Path2D();
       // body
-      ctx.translate(400, 400);
+      ctx.translate(0, 820);
       ctx.scale(1, -1);
       ctx.fillStyle = 'rgb(255,255,255)';
       p.moveTo(this.x, this.y);
@@ -146,8 +146,7 @@ function playerSprite(ctx, x, y) {
       h.lineTo(this.x + 9, this.y - 98);
       ctx.fill(h);
       
-      ctx.translate(0,0);
-      ctx.scale(1,1);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
   }
 }

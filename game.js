@@ -276,13 +276,13 @@ function game() {
   function player(x, y, _keystroke) {
   		var score = 0;
 
-  		//ctx.font = '100px sans-serif';
-
   		return {
   			draw: function() {
-          ctx.fillStyle = 'rgba(240,240,240,0.75)';
-          text(_keystroke.getLetter(), x, y, 'center', '400px');
-          ctx.fillStyle = 'rgb(255,255,255)';
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'black';
+          text(_keystroke.getLetter(), x, y, 'center', '400px', 'rgba(255,255,255,0.8)');
+          ctx.strokeText(_keystroke.getLetter(), x, y);
+          ctx.lineWidth = 0;
   			},
   			getScore: function() {
   				return score;
@@ -319,11 +319,18 @@ function game() {
     }
   }
 
-  function text(msg, x, y, align, size) {
+  function text(msg, x, y, align, size, colour) {
     if (align !== undefined) {
       ctx.textAlign = align;
     }
-    ctx.fillStyle = 'rgb(255,255,255)';
+    
+    if (colour === undefined) {
+      ctx.fillStyle = 'rgb(255,255,255)';
+    }
+    else {
+      ctx.fillStyle = colour;
+    }
+    
     ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
     ctx.fillText(msg, x, y);
   }
@@ -338,6 +345,6 @@ function game() {
     m.draw();
     g.draw();
     ps1.draw();
-    //ps1.drawReflection();
+    ps1.drawReflection();
   }
 }
