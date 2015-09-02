@@ -177,7 +177,7 @@ function game() {
       reset();
     }
     else if (_game.state == 'attack') {
-      sprites.ball.setAttack(_game.chosenAttack.colour);
+      sprites.ball.setAttack(_game.chosenAttack);
       var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
       text(aMsg, centre.x, centre.y, 'center');
       frame++;

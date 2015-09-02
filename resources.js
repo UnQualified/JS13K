@@ -80,8 +80,9 @@ function attackBall(ctx, x, y, radius, speed, player) {
       this.player = plyr;
       this.x = this.player === 1 ? 180 : 780;
     },
-    setAttack: function(colour) {
-      this.colour = colour;
+    setAttack: function(attack) {
+      this.colour = attack.colour;
+      this.radius = attack.damage;
     },
     draw: function() {
       if (this.show) {
