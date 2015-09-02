@@ -92,6 +92,15 @@ function attackBall(ctx, x, y, radius, speed, player) {
         ctx.fill();
       }
     },
+    drawReflection: function() {
+      if (this.show) {
+        ctx.fillStyle = this.colour;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y + 170, this.radius, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+      }
+    },
     update: function() {
       if (this.show) {
         this.x += this.player === 1 ? this.speed : this.speed * -1;

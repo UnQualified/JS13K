@@ -369,6 +369,7 @@ function game() {
       s.draw();
     });
     sprites.ball.draw();
+    sprites.ball.drawReflection();
     m.draw();
     g.draw();
 
