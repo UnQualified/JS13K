@@ -51,7 +51,8 @@ function game() {
   };
   
   var sprites = {
-    stars: starField(ctx, 30)
+    stars: starField(ctx, 30),
+    ball: attackBall(ctx, 180, 320, 40, 5, 1)
   };
 
   window.requestAnimationFrame(loop);
@@ -118,6 +119,7 @@ function game() {
   function loop() {
     clear();
     draw();
+    sprites.ball.update();
 
     // logic
     ctx.fillStyle = 'black';
@@ -190,20 +192,23 @@ function game() {
       frame++;
       var seconds = 60 / _game.chosenAttack.speed * 10;
       text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
+      
+      sprites.ball.speed = 575 / (seconds / 10) / 10;
+      sprites.ball.show = true;
 
       switch (_game.defender) {
         case 1:
-          //p1.draw(ctx);
+          p1.draw(ctx);
           if (p1.getScore() >= 100) {
             _game.state = 'attackFail';
           }
           break;
-          case 2:
-            //p2.draw(ctx);
-            if (p2.getScore() >= 100) {
-              _game.state = 'attackFail';
-            }
-            break;
+        case 2:
+          p2.draw(ctx);
+          if (p2.getScore() >= 100) {
+            _game.state = 'attackFail';
+          }
+          break;
       }
 
       if (frame >= seconds) {
@@ -212,6 +217,7 @@ function game() {
     }
     else if (_game.state == 'attackFail') {
       reset();
+      sprites.ball.show = false;
       if (_game.defender === 1) {
         _game.playerTwoHealth -= _game.chosenAttack.damage / 2;
         if (_game.playerTwoHealth <= 0) {
@@ -234,6 +240,7 @@ function game() {
       }
     }
     else if (_game.state == 'attackSuccess') {
+      sprites.ball.show = false;
       var _continue = true;
       if (_game.defender === 1) {
         _game.playerOneHealth -= _game.chosenAttack.damage;
@@ -350,11 +357,12 @@ function game() {
     var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
     var w = water(ctx, 0, 420);
     
+    
     // stars
     sprites.stars.forEach(function (s) {
       s.draw();
     });
-    
+    sprites.ball.draw();
     m.draw();
     g.draw();
 

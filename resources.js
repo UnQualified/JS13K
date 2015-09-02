@@ -66,6 +66,35 @@ function moon(ctx, x, y) {
   };
 }
 
+function attackBall(ctx, x, y, radius, speed, player) {
+  var initialX = x;
+  return {
+    x: x,
+    y: y,
+    speed: speed,
+    player: player,
+    radius: radius,
+    show: false,
+    draw: function() {
+      if (this.show) {
+        ctx.fillStyle = 'rgb(255,0,0)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+      }
+    },
+    update: function() {
+      if (this.show) {
+        this.x += this.speed;
+      }
+      else {
+        this.x = initialX;
+      }
+    }
+  }
+}
+
 function star(ctx, x, y) {
   return {
     x: x,
@@ -198,7 +227,6 @@ function rnd(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// gulp concat??
 function KeyStroke(initialKey) {
 	this.currentLetter = initialKey; //rnd(65, 90);//this.getRandom(65, 90);
 }
@@ -250,3 +278,4 @@ Attack.prototype.selectedAttack = function(msg) {
 		this.ctx.fillText(msg + ' selected', 20, 100);
 	}
 };
+
