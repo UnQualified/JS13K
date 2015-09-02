@@ -31,22 +31,26 @@ function game() {
   		water: {
   			type: 'water',
   			speed: 2,
-  			damage: 30
+  			damage: 30,
+  			colour: 'rgb(0,0,255)'
   		},
   		fire: {
   			type: 'fire',
   			speed: 1,
-  			damage: 40
+  			damage: 40,
+  			colour: 'rgb(255,0,0)'
   		},
   		electric: {
   			type: 'electric',
   			speed: 3,
-  			damage: 15
+  			damage: 15,
+  			colour: 'rgb(255,255,0)'
   		},
   		special: {
   			type: 'special',
   			speed: 2,
-  			damage: 50
+  			damage: 50,
+  			colour: 'rbg(255,0,255)'
   		}
   };
   
@@ -149,6 +153,7 @@ function game() {
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
+          sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
         else if (frame < 240) {
@@ -172,6 +177,7 @@ function game() {
       reset();
     }
     else if (_game.state == 'attack') {
+      sprites.ball.setAttack(_game.chosenAttack.colour);
       var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
       text(aMsg, centre.x, centre.y, 'center');
       frame++;

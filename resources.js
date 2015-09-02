@@ -75,9 +75,17 @@ function attackBall(ctx, x, y, radius, speed, player) {
     player: player,
     radius: radius,
     show: false,
+    colour: 'rgb(255,255,255)',
+    setPlayer: function(plyr) {
+      this.player = plyr;
+      this.x = this.player === 1 ? 180 : 780;
+    },
+    setAttack: function(colour) {
+      this.colour = colour;
+    },
     draw: function() {
       if (this.show) {
-        ctx.fillStyle = 'rgb(255,0,0)';
+        ctx.fillStyle = this.colour; //'rgb(255,0,0)';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
@@ -86,10 +94,10 @@ function attackBall(ctx, x, y, radius, speed, player) {
     },
     update: function() {
       if (this.show) {
-        this.x += this.speed;
+        this.x += this.player === 1 ? this.speed : this.speed * -1;
       }
       else {
-        this.x = initialX;
+        //this.x = this.player === 1 ? 180;
       }
     }
   }
