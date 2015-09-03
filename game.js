@@ -56,7 +56,10 @@ function game() {
   
   var sprites = {
     stars: starField(ctx, 30),
-    ball: attackBall(ctx, 180, 320, 40, 5, 1)
+    ball: attackBall(ctx, 180, 320, 40, 5, 1),
+    g: ground(ctx, 0, 400),
+    ps1: playerSprite(ctx, 150, 370), //this.g.y - 30)
+    ps2: playerSprite(ctx, 810, 370, 2)
   };
 
   window.requestAnimationFrame(loop);
@@ -226,8 +229,10 @@ function game() {
       sprites.ball.show = false;
       if (_game.defender === 1) {
         _game.playerTwoHealth -= _game.chosenAttack.damage / 2;
+        sprites.ps2.health = _game.playerTwoHealth;
         if (_game.playerTwoHealth <= 0) {
           _game.playerTwoHealth = 0;
+          sprites.ps2.health = _game.playerTwoHealth;
           reset({state:'gameOver'});
         }
         else {
@@ -236,8 +241,10 @@ function game() {
       }
       else {
         _game.playerOneHealth -= _game.chosenAttack.damage / 2;
+        sprites.ps1.health = _game.playerOneHealth;
         if (_game.playerOneHealth <= 0) {
           _game.playerOneHealth = 0;
+          sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
         }
         else {
@@ -250,8 +257,10 @@ function game() {
       var _continue = true;
       if (_game.defender === 1) {
         _game.playerOneHealth -= _game.chosenAttack.damage;
+        sprites.ps1.health = _game.playerOneHealth;
         if (_game.playerOneHealth <= 0) {
           _game.playerOneHealth = 0;
+          sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
@@ -259,8 +268,10 @@ function game() {
       }
       else {
         _game.playerTwoHealth -= _game.chosenAttack.damage;
+        sprites.ps2.health = _game.playerTwoHealth;
         if (_game.playerTwoHealth <= 0) {
           _game.playerTwoHealth = 0;
+          sprites.ps2.health = _game.playerTwoHealth;
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
@@ -358,9 +369,9 @@ function game() {
     
     // THESE SHOULD BE DECLARED AS VARIABLES OUTSIDE THE LOOP    
     var m = moon(ctx, 800, 100);
-    var g = ground(ctx, 0, 400);
-    var ps1 = playerSprite(ctx, 150, g.y - 30);
-    var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
+    //var g = ground(ctx, 0, 400);
+    //var ps1 = playerSprite(ctx, 150, g.y - 30);
+    //var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
     var w = water(ctx, 0, 420);
     
     
@@ -371,13 +382,13 @@ function game() {
     sprites.ball.draw();
     sprites.ball.drawReflection();
     m.draw();
-    g.draw();
+    sprites.g.draw();
 
-    ps1.draw();
-    ps1.drawReflection();
+    sprites.ps1.draw();
+    sprites.ps1.drawReflection();
     
-    ps2.draw();
-    ps2.drawReflection();
+    sprites.ps2.draw();
+    sprites.ps2.drawReflection();
     
     w.draw();
   }

@@ -142,7 +142,7 @@ function ground(ctx, x, y) {
   return {
     x: x,
     y: y,
-    height: 20,
+    height: 10,
     draw: function() {
       ctx.fillStyle = 'rgb(99,99,99)';
       ctx.fillRect(this.x, this.y, canvas.width, this.height);
@@ -172,10 +172,14 @@ function playerSprite(ctx, x, y, number) {
   return {
     x: x,
     y: y,
+    health: 100,
     draw: function() {
       var p = new Path2D();
-      // body
       ctx.fillStyle = 'rgb(255,255,255)';
+      // health
+      //ctx.fillRect(this.x - 50, this.y - 130, 100, 10);
+      
+      // body
       p.moveTo(this.x, this.y);
       p.lineTo(this.x - (40 * dir), this.y);
       p.lineTo(this.x - (10 * dir), this.y - 100);
@@ -208,7 +212,7 @@ function playerSprite(ctx, x, y, number) {
       // body
       ctx.translate(0, 820);
       ctx.scale(1, -1);
-      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.fillStyle = 'rgba(255,255,255,' + this.health / 100 + ')';
       p.moveTo(this.x, this.y);
       p.lineTo(this.x - (40 * dir), this.y);
       p.lineTo(this.x - (10 * dir), this.y - 100);
@@ -229,7 +233,7 @@ function playerSprite(ctx, x, y, number) {
       
       // hood
       var h = new Path2D();
-      ctx.fillStyle = 'rgb(40,40,40)';
+      ctx.fillStyle = 'rgba(40,40,40,' + this.health/100 + ')';
       h.moveTo(this.x + (17 * dir), this.y - 98);
       h.lineTo(this.x + (19 * dir), this.y - 75);
       h.lineTo(this.x + (4 * dir), this.y - 75);
