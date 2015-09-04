@@ -59,7 +59,9 @@ function game() {
     ball: attackBall(ctx, 180, 320, 40, 5, 1),
     g: ground(ctx, 0, 400),
     ps1: playerSprite(ctx, 150, 370), //this.g.y - 30)
-    ps2: playerSprite(ctx, 810, 370, 2)
+    ps2: playerSprite(ctx, 810, 370, 2),
+    w: water(ctx, 0, 410),
+    m: moon(ctx, 800, 100)
   };
 
   window.requestAnimationFrame(loop);
@@ -131,7 +133,7 @@ function game() {
     // logic
     ctx.fillStyle = 'black';
     if (_game.state !== 'menu') {
-      text(_game.state, canvas.width - 200, 20, 'left');
+      //text(_game.state, canvas.width - 200, 20, 'left');
       text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
       text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
     }
@@ -354,26 +356,22 @@ function game() {
     
     if (colour === undefined) {
       ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.shadowColor = 'white';
     }
     else {
       ctx.fillStyle = colour;
+      ctx.shadowColor = colour;
     }
     
     ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
+    ctx.shadowBlur = 10;
     ctx.fillText(msg, x, y);
+    ctx.shadowBlur = 0;
   }
 
   function draw() {
     //backgroundOne(ctx);
     //backgroundTwo(ctx);
-    
-    // THESE SHOULD BE DECLARED AS VARIABLES OUTSIDE THE LOOP    
-    var m = moon(ctx, 800, 100);
-    //var g = ground(ctx, 0, 400);
-    //var ps1 = playerSprite(ctx, 150, g.y - 30);
-    //var ps2 = playerSprite(ctx, 810, g.y - 30, 2);
-    var w = water(ctx, 0, 420);
-    
     
     // stars
     sprites.stars.forEach(function (s) {
@@ -381,7 +379,7 @@ function game() {
     });
     sprites.ball.draw();
     sprites.ball.drawReflection();
-    m.draw();
+    sprites.m.draw();
     sprites.g.draw();
 
     sprites.ps1.draw();
@@ -390,6 +388,6 @@ function game() {
     sprites.ps2.draw();
     sprites.ps2.drawReflection();
     
-    w.draw();
+    sprites.w.draw();
   }
 }

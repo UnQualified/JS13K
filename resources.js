@@ -1,48 +1,3 @@
-// paths!
-function backgroundOne(ctx) {
-	ctx.fillStyle = 'rgb(225,225,225)';
-	var p = new Path2D();
-	p.moveTo(0, 200);
-	p.lineTo(175, 150);
-	p.lineTo(225, 175);
-	p.lineTo(300, 215);
-	p.lineTo(350, 195);
-	p.lineTo(400, 135);
-	p.lineTo(425, 120);
-	p.lineTo(429, 175);
-	p.lineTo(500, 230);
-	p.lineTo(600, 275);
-	p.lineTo(650, 200);
-	p.lineTo(675, 170);
-	p.lineTo(700, 190);
-	p.lineTo(810, 166);
-	p.lineTo(850, 150);
-	p.lineTo(900, 170);
-	p.lineTo(960, 165);
-	p.lineTo(960, 540);
-	p.lineTo(0, 540);
-	ctx.fill(p);
-}
-
-function backgroundTwo(ctx) {
-	ctx.fillStyle = 'rgb(200,200,200)';
-	var p = new Path2D();
-	p.moveTo(0,180);
-	p.lineTo(100, 300);
-	p.lineTo(225, 350);
-	p.lineTo(350, 375);
-	p.lineTo(400, 310);
-	p.lineTo(460, 225);
-	p.lineTo(575, 185);
-	p.lineTo(645, 237);
-	p.lineTo(760, 270);
-	p.lineTo(820, 312);
-	p.lineTo(960, 250);
-	p.lineTo(960, 540);
-	p.lineTo(0, 540);
-	ctx.fill(p);
-}
-
 function moon(ctx, x, y) {  
   return {
     x: x,
@@ -51,10 +6,13 @@ function moon(ctx, x, y) {
     draw: function() {
       // bright side
       ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.shadowColor = 'rgba(255,255,255,0.8)';
+      ctx.shadowBlur = 30;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fill();
+      ctx.shadowBlur = 0;
       
       // dark side
       ctx.fillStyle = 'rgb(0,0,0)';
@@ -76,6 +34,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
     radius: radius,
     show: false,
     colour: 'rgb(255,255,255)',
+    gradient: this.colour,
     setPlayer: function(plyr) {
       this.player = plyr;
       this.x = this.player === 1 ? 180 : 780;
@@ -84,22 +43,34 @@ function attackBall(ctx, x, y, radius, speed, player) {
       this.colour = attack.colour;
       this.radius = attack.damage;
     },
+    updateGradient: function() {
+      this.gradient = ctx.createRadialGradient(this.x, this.y, 5, this.x, this.y, this.radius * 0.9);
+      this.gradient.addColorStop(0, 'white');
+      this.gradient.addColorStop(1, this.colour);
+    },
     draw: function() {
       if (this.show) {
-        ctx.fillStyle = this.colour; //'rgb(255,0,0)';
+        this.updateGradient();
+        this.shadowColor = this.colour;
+        this.shadowBlur = 40;
+        ctx.fillStyle = this.gradient;//this.colour; //'rgb(255,0,0)';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();
+        this.shadowBlur = 0;
       }
     },
     drawReflection: function() {
       if (this.show) {
-        ctx.fillStyle = this.colour;
+        ctx.fillStyle = this.gradient;//this.colour;
+        ctx.shadowColor = this.colour;
+        ctx.shadowBlur = 30;
         ctx.beginPath();
         ctx.arc(this.x, this.y + 170, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
     },
     update: function() {
@@ -178,6 +149,8 @@ function playerSprite(ctx, x, y, number) {
       ctx.fillStyle = 'rgb(255,255,255)';
       // health
       //ctx.fillRect(this.x - 50, this.y - 130, 100, 10);
+      ctx.shadowColor = 'white';
+      ctx.shadowBlur = 10;
       
       // body
       p.moveTo(this.x, this.y);
@@ -197,6 +170,7 @@ function playerSprite(ctx, x, y, number) {
       p.lineTo(this.x + (7 * dir), this.y);
       
       ctx.fill(p);
+      ctx.shadowBlur = 0;
       
       // hood
       var h = new Path2D();
@@ -213,6 +187,8 @@ function playerSprite(ctx, x, y, number) {
       ctx.translate(0, 820);
       ctx.scale(1, -1);
       ctx.fillStyle = 'rgba(255,255,255,' + this.health / 100 + ')';
+      ctx.shadowColor = 'rgba(255,255,255,' + this.health / 100 + ')';
+      ctx.shadowBlur = 20;
       p.moveTo(this.x, this.y);
       p.lineTo(this.x - (40 * dir), this.y);
       p.lineTo(this.x - (10 * dir), this.y - 100);
@@ -230,6 +206,7 @@ function playerSprite(ctx, x, y, number) {
       p.lineTo(this.x + (7 * dir), this.y);
       
       ctx.fill(p);
+      ctx.shadowBlur = 0;
       
       // hood
       var h = new Path2D();
