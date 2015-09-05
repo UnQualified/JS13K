@@ -15,11 +15,18 @@ function game() {
   var attacks = new Attack(ctx);
 
   var frame = 0;
-  var yOffset = canvas.height * 1.25;
+  //var offsets.yOffset = canvas.height * 1.25;
+  //var offsets.medYOffset = yOffset * 0.1;
+  //var slowYOffset = yOffset * 0.05;
+  var offsets = {
+    yOffset: canvas.height * 1.25,
+    medYOffset: canvas.height * 1.25 * 0.1,
+    slowYOffset: canvas.height * 1.25 * 0.05
+  };
   var offsetSpeeds = {
     fast: 2,
-    med: 0.2,
-    slow: 0.1
+    med: 2 * 0.1,
+    slow: 2 * 0.05
   };
   var _game = {
   		state: 'menu',
@@ -61,13 +68,13 @@ function game() {
   };
 
   var sprites = {
-    stars: starField(ctx, 30),
+    stars: starField(ctx, 30, offsets, offsetSpeeds),
     ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
-    g: ground(ctx, 0, 400 - 30, yOffset),
-    ps1: playerSprite(ctx, 150, 370 - 30, yOffset), //this.g.y - 30)
-    ps2: playerSprite(ctx, 810, 370 - 30, yOffset, 2),
-    w: water(ctx, 0, 410 - 30, yOffset),
-    m: moon(ctx, 800, 100)
+    g: ground(ctx, 0, 400 - 30, offsets.yOffset),
+    ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset), //this.g.y - 30)
+    ps2: playerSprite(ctx, 810, 370 - 30, offsets.yOffset, 2),
+    w: water(ctx, 0, 410 - 30, offsets.yOffset),
+    m: moon(ctx, 800, 100, offsets.medYOffset)
   };
 
   window.requestAnimationFrame(loop);
@@ -139,21 +146,6 @@ function game() {
 
     // logic
     ctx.fillStyle = 'black';
-    /*
-    if (_game.state !== 'menu') {
-      //text(_game.state, canvas.width - 200, 20, 'left');
-      text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
-      text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
-    }
-    else {
-      //ctx.font = '52px sans-serif';
-      text(TITLE.toUpperCase(), centre.x, centre.y - 50, 'center', '52px');
-      //ctx.font = '22px sans-serif';
-      text('press [space] to start', centre.x, centre.y + 20, 'center');
-      if (_game.start) {
-        _game.state = 'toss';
-      }
-    }*/
 
     if (_game.state === 'menu') {
       text(TITLE.toUpperCase(), centre.x, centre.y -50, 'center', '52px');
@@ -163,9 +155,15 @@ function game() {
       text('INTRO', centre.x, centre.y + 100, 'center');
       sprites.g.reduceOffset(offsetSpeeds.fast);
       sprites.w.reduceOffset(offsetSpeeds.fast);
-      console.log(sprites.w.y);
       sprites.ps1.reduceOffset(offsetSpeeds.fast);
       sprites.ps2.reduceOffset(offsetSpeeds.fast);
+      sprites.m.reduceOffset(offsetSpeeds.med);
+      sprites.stars.forEach(function (item) {
+        item.reduceOffset();
+      });
+      if (sprites.ps1.scrollComplete) {
+        _game.start = true;
+      }
       if (_game.start) {
         _game.state = 'toss';
       }
@@ -415,10 +413,11 @@ function game() {
   }
 }
 
-function moon(ctx, x, y) {
+function moon(ctx, x, y, offset) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     radius: 40,
     draw: function() {
       // bright side
@@ -437,6 +436,14 @@ function moon(ctx, x, y) {
       ctx.arc(this.x + 10, this.y - 10, this.radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fill();
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
     }
   };
 }
@@ -501,10 +508,11 @@ function attackBall(ctx, x, y, radius, speed, player) {
   };
 }
 
-function star(ctx, x, y) {
+function star(ctx, x, y, offset, offsetSpeed) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     radius: rnd(1,3),
     draw: function() {
       ctx.fillStyle = 'rgb(255,255,255)';
@@ -512,16 +520,34 @@ function star(ctx, x, y) {
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fill();
+    },
+    reduceOffset: function() {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= offsetSpeed;
+      }
     }
   };
 }
 
-function starField(ctx, num) {
+function starField(ctx, num, offsets, offsetSpeeds) {
   var stars = [];
   for (var i = 0; i < num; i++) {
     var x = rnd(0, 960);
     var y = rnd(0, 540);
-    stars.push(star(ctx, x, y));
+    var spd = rnd(0,1);
+    var offset = {};
+    if (spd === 1) {
+      offset.speed = offsetSpeeds.med;
+      offset.offset = offsets.medYOffset;
+    }
+    else {
+      offset.speed = offsetSpeeds.slow;
+      offset.offset = offsets.slowYOffset;
+    }
+    stars.push(star(ctx, x, y, offset.offset, offset.speed));
   }
   return stars;
 }
@@ -586,6 +612,7 @@ function playerSprite(ctx, x, y, offset, number) {
     x: x,
     y: y + offset,
     health: 100,
+    scrollComplete: false,
     draw: function() {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
@@ -665,6 +692,7 @@ function playerSprite(ctx, x, y, offset, number) {
     reduceOffset: function(speed) {
       if (this.y <= originalY) {
         this.y = originalY;
+        this.scrollComplete = true;
       }
       else {
         this.y -= speed;

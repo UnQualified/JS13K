@@ -15,11 +15,18 @@ function game() {
   var attacks = new Attack(ctx);
 
   var frame = 0;
-  var yOffset = canvas.height * 1.25;
+  //var offsets.yOffset = canvas.height * 1.25;
+  //var offsets.medYOffset = yOffset * 0.1;
+  //var slowYOffset = yOffset * 0.05;
+  var offsets = {
+    yOffset: canvas.height * 1.25,
+    medYOffset: canvas.height * 1.25 * 0.1,
+    slowYOffset: canvas.height * 1.25 * 0.05
+  };
   var offsetSpeeds = {
     fast: 2,
-    med: 0.2,
-    slow: 0.1
+    med: 2 * 0.1,
+    slow: 2 * 0.05
   };
   var _game = {
   		state: 'menu',
@@ -61,13 +68,13 @@ function game() {
   };
 
   var sprites = {
-    stars: starField(ctx, 30),
+    stars: starField(ctx, 30, offsets, offsetSpeeds),
     ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
-    g: ground(ctx, 0, 400 - 30, yOffset),
-    ps1: playerSprite(ctx, 150, 370 - 30, yOffset), //this.g.y - 30)
-    ps2: playerSprite(ctx, 810, 370 - 30, yOffset, 2),
-    w: water(ctx, 0, 410 - 30, yOffset),
-    m: moon(ctx, 800, 100)
+    g: ground(ctx, 0, 400 - 30, offsets.yOffset),
+    ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset), //this.g.y - 30)
+    ps2: playerSprite(ctx, 810, 370 - 30, offsets.yOffset, 2),
+    w: water(ctx, 0, 410 - 30, offsets.yOffset),
+    m: moon(ctx, 800, 100, offsets.medYOffset)
   };
 
   window.requestAnimationFrame(loop);
@@ -139,21 +146,6 @@ function game() {
 
     // logic
     ctx.fillStyle = 'black';
-    /*
-    if (_game.state !== 'menu') {
-      //text(_game.state, canvas.width - 200, 20, 'left');
-      text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
-      text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
-    }
-    else {
-      //ctx.font = '52px sans-serif';
-      text(TITLE.toUpperCase(), centre.x, centre.y - 50, 'center', '52px');
-      //ctx.font = '22px sans-serif';
-      text('press [space] to start', centre.x, centre.y + 20, 'center');
-      if (_game.start) {
-        _game.state = 'toss';
-      }
-    }*/
 
     if (_game.state === 'menu') {
       text(TITLE.toUpperCase(), centre.x, centre.y -50, 'center', '52px');
@@ -163,9 +155,15 @@ function game() {
       text('INTRO', centre.x, centre.y + 100, 'center');
       sprites.g.reduceOffset(offsetSpeeds.fast);
       sprites.w.reduceOffset(offsetSpeeds.fast);
-      console.log(sprites.w.y);
       sprites.ps1.reduceOffset(offsetSpeeds.fast);
       sprites.ps2.reduceOffset(offsetSpeeds.fast);
+      sprites.m.reduceOffset(offsetSpeeds.med);
+      sprites.stars.forEach(function (item) {
+        item.reduceOffset();
+      });
+      if (sprites.ps1.scrollComplete) {
+        _game.start = true;
+      }
       if (_game.start) {
         _game.state = 'toss';
       }

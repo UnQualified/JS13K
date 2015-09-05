@@ -1,7 +1,8 @@
-function moon(ctx, x, y) {
+function moon(ctx, x, y, offset) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     radius: 40,
     draw: function() {
       // bright side
@@ -20,6 +21,14 @@ function moon(ctx, x, y) {
       ctx.arc(this.x + 10, this.y - 10, this.radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fill();
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
     }
   };
 }
@@ -84,10 +93,11 @@ function attackBall(ctx, x, y, radius, speed, player) {
   };
 }
 
-function star(ctx, x, y) {
+function star(ctx, x, y, offset, offsetSpeed) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     radius: rnd(1,3),
     draw: function() {
       ctx.fillStyle = 'rgb(255,255,255)';
@@ -95,16 +105,34 @@ function star(ctx, x, y) {
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fill();
+    },
+    reduceOffset: function() {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= offsetSpeed;
+      }
     }
   };
 }
 
-function starField(ctx, num) {
+function starField(ctx, num, offsets, offsetSpeeds) {
   var stars = [];
   for (var i = 0; i < num; i++) {
     var x = rnd(0, 960);
     var y = rnd(0, 540);
-    stars.push(star(ctx, x, y));
+    var spd = rnd(0,1);
+    var offset = {};
+    if (spd === 1) {
+      offset.speed = offsetSpeeds.med;
+      offset.offset = offsets.medYOffset;
+    }
+    else {
+      offset.speed = offsetSpeeds.slow;
+      offset.offset = offsets.slowYOffset;
+    }
+    stars.push(star(ctx, x, y, offset.offset, offset.speed));
   }
   return stars;
 }
@@ -169,6 +197,7 @@ function playerSprite(ctx, x, y, offset, number) {
     x: x,
     y: y + offset,
     health: 100,
+    scrollComplete: false,
     draw: function() {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
@@ -248,6 +277,7 @@ function playerSprite(ctx, x, y, offset, number) {
     reduceOffset: function(speed) {
       if (this.y <= originalY) {
         this.y = originalY;
+        this.scrollComplete = true;
       }
       else {
         this.y -= speed;
