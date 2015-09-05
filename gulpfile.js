@@ -28,15 +28,15 @@ gulp.task('zip', function() {
 
 // The background tasks
 gulp.task('concat', function() {
-  return gulp.src(['game.js', 'resources.js'])
+  return gulp.src(['game.js', 'resources.js', 'sounds.js'])
     .pipe(concat('compiled.js'))
     .pipe(gulp.dest('./'))
     //.pipe(concat('game.js'))
-    .pipe(gulp.dest('./release/src/'))
+    .pipe(gulp.dest('./release/src/'));
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['./*.js'])
+  return gulp.src(['game.js', 'resources.js', 'sounds.js'])//['./*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError());

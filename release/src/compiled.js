@@ -7,6 +7,8 @@ function game() {
   //canvas.style.backgroundColor = 'rgb(0,0,0)';
   var centre = getCanvasCentre();
 
+  var sounds = new Sounds();
+
   var availableKeys = new AvailableKeys();
   var keyStroke = new KeyStroke(availableKeys.getKey());
   var p2Keys = new KeyStroke(availableKeys.getKey());
@@ -15,9 +17,6 @@ function game() {
   var attacks = new Attack(ctx);
 
   var frame = 0;
-  //var offsets.yOffset = canvas.height * 1.25;
-  //var offsets.medYOffset = yOffset * 0.1;
-  //var slowYOffset = yOffset * 0.05;
   var offsets = {
     yOffset: canvas.height * 1.25,
     medYOffset: canvas.height * 1.25 * 0.1,
@@ -91,12 +90,15 @@ function game() {
         availableKeys.keys[keyStroke.currentLetter - 65].available = true;
         keyStroke.assignLetter(availableKeys.getKey());
         p1.updateScore(10);
+        sounds.playSuccess(Math.round(p1.getScore()/10 - 1));
       }
       // player 2
       else if (event.keyCode === p2Keys.currentLetter) {
         availableKeys.keys[p2Keys.currentLetter - 65].avaialble = true;
         p2Keys.assignLetter(availableKeys.getKey());
         p2.updateScore(10);
+        // need slightly different sound for player 2...
+        sounds.playSuccess(Math.round(p2.getScore()/10 - 1));
       }
     }
     else if (_game.state === 'attackIncoming') {
@@ -756,3 +758,61 @@ Attack.prototype.selectedAttack = function(msg) {
 		this.ctx.fillText(msg + ' selected', 20, 100);
 	}
 };
+
+function Sounds() {
+  this.audioContext = new AudioContext();
+  this.notes = [
+    [-3, 2, 9],
+    [0, 5, 12],
+    [3, 8, 15],
+    [6, 11, 18],
+    [9, 14, 21]
+  ];
+}
+Sounds.prototype.playSuccess = function(val) {
+  var speed = 0.05;
+  var place = 0 - speed;
+  var duration = 0.05;
+  for (var j = 0; j < this.notes[val].length; j++) {
+    this.play(place += speed, this.notes[val][j], duration);
+  }
+};
+Sounds.prototype.play = function(startAfter, pitch, duration) {
+  //var length = 0.5;
+  //var delay = 0.5;
+
+  var time = this.audioContext.currentTime + startAfter;
+  var input = this.audioContext.createGain();
+  var feedback = this.audioContext.createGain();
+  var delay = this.audioContext.createDelay();
+
+  var output = this.audioContext.createGain();
+  output.connect(this.audioContext.destination);
+
+  delay.delayTime.value = 0.1;
+  feedback.gain.value = 0.4; // dangerous when > 1 ;-)
+
+  // dry path
+  input.connect(output);
+
+  // wet path
+  input.connect(delay);
+
+  // feedback loop
+  delay.connect(feedback);
+  feedback.connect(delay);
+  feedback.connect(output);
+
+
+  var oscillator = this.audioContext.createOscillator();
+  oscillator.connect(delay);
+
+  oscillator.type = 'square';
+  oscillator.detune.value = pitch * 100;
+
+  oscillator.start(time);
+  oscillator.stop(time + duration);
+};
+
+//var s = new Sounds();
+//s.playSuccess(4);
