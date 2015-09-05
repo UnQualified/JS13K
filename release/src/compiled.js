@@ -1,5 +1,5 @@
 function game() {
-
+  var TITLE = 'The Odul Mages';
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   canvas.width = 960;
@@ -15,6 +15,12 @@ function game() {
   var attacks = new Attack(ctx);
 
   var frame = 0;
+  var yOffset = canvas.height * 1.25;
+  var offsetSpeeds = {
+    fast: 2,
+    med: 0.2,
+    slow: 0.1
+  };
   var _game = {
   		state: 'menu',
   		attackingPlayer: null,
@@ -31,30 +37,45 @@ function game() {
   		water: {
   			type: 'water',
   			speed: 2,
-  			damage: 30
+  			damage: 30,
+  			colour: 'rgb(0,0,255)'
   		},
   		fire: {
   			type: 'fire',
   			speed: 1,
-  			damage: 40
+  			damage: 40,
+  			colour: 'rgb(255,0,0)'
   		},
   		electric: {
   			type: 'electric',
   			speed: 3,
-  			damage: 15
+  			damage: 15,
+  			colour: 'rgb(255,255,0)'
   		},
   		special: {
   			type: 'special',
   			speed: 2,
-  			damage: 50
+  			damage: 50,
+  			colour: 'rbg(255,0,255)'
   		}
+  };
+
+  var sprites = {
+    stars: starField(ctx, 30),
+    ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
+    g: ground(ctx, 0, 400 - 30, yOffset),
+    ps1: playerSprite(ctx, 150, 370 - 30, yOffset), //this.g.y - 30)
+    ps2: playerSprite(ctx, 810, 370 - 30, yOffset, 2),
+    w: water(ctx, 0, 410 - 30, yOffset),
+    m: moon(ctx, 800, 100)
   };
 
   window.requestAnimationFrame(loop);
   window.addEventListener("keydown", function (event) {
     if (_game.state === 'menu') {
       if (event.keyCode === 32) {
-        _game.start = true;
+        //_game.start = true;
+        _game.state = 'intro';
       }
     }
     else if (_game.state === 'toss') {
@@ -114,25 +135,42 @@ function game() {
   function loop() {
     clear();
     draw();
+    sprites.ball.update();
 
     // logic
     ctx.fillStyle = 'black';
+    /*
     if (_game.state !== 'menu') {
-      text(_game.state, canvas.width - 200, 20, 'left');
+      //text(_game.state, canvas.width - 200, 20, 'left');
       text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
       text('player 2: ' + _game.playerTwoHealth, canvas.width - 200, canvas.height - 50);
     }
     else {
       //ctx.font = '52px sans-serif';
-      text('GAME TITLE', centre.x, centre.y - 50, 'center', '52px');
+      text(TITLE.toUpperCase(), centre.x, centre.y - 50, 'center', '52px');
       //ctx.font = '22px sans-serif';
       text('press [space] to start', centre.x, centre.y + 20, 'center');
       if (_game.start) {
         _game.state = 'toss';
       }
-    }
+    }*/
 
-    if (_game.state === 'toss') {
+    if (_game.state === 'menu') {
+      text(TITLE.toUpperCase(), centre.x, centre.y -50, 'center', '52px');
+      text('press [space]', centre.x, centre.y + 20, 'center');
+    }
+    else if (_game.state === 'intro') {
+      text('INTRO', centre.x, centre.y + 100, 'center');
+      sprites.g.reduceOffset(offsetSpeeds.fast);
+      sprites.w.reduceOffset(offsetSpeeds.fast);
+      console.log(sprites.w.y);
+      sprites.ps1.reduceOffset(offsetSpeeds.fast);
+      sprites.ps2.reduceOffset(offsetSpeeds.fast);
+      if (_game.start) {
+        _game.state = 'toss';
+      }
+    }
+    else if (_game.state === 'toss') {
       if (p1.getScore() < DEBUGHEALTH && p2.getScore() < DEBUGHEALTH) {
         p1.draw(ctx);
         p2.draw(ctx);
@@ -143,6 +181,7 @@ function game() {
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
+          sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
         else if (frame < 240) {
@@ -166,6 +205,7 @@ function game() {
       reset();
     }
     else if (_game.state == 'attack') {
+      sprites.ball.setAttack(_game.chosenAttack);
       var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
       text(aMsg, centre.x, centre.y, 'center');
       frame++;
@@ -187,19 +227,22 @@ function game() {
       var seconds = 60 / _game.chosenAttack.speed * 10;
       text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
 
+      sprites.ball.speed = 575 / (seconds / 10) / 10;
+      sprites.ball.show = true;
+
       switch (_game.defender) {
         case 1:
-          //p1.draw(ctx);
+          p1.draw(ctx);
           if (p1.getScore() >= 100) {
             _game.state = 'attackFail';
           }
           break;
-          case 2:
-            //p2.draw(ctx);
-            if (p2.getScore() >= 100) {
-              _game.state = 'attackFail';
-            }
-            break;
+        case 2:
+          p2.draw(ctx);
+          if (p2.getScore() >= 100) {
+            _game.state = 'attackFail';
+          }
+          break;
       }
 
       if (frame >= seconds) {
@@ -208,10 +251,13 @@ function game() {
     }
     else if (_game.state == 'attackFail') {
       reset();
+      sprites.ball.show = false;
       if (_game.defender === 1) {
         _game.playerTwoHealth -= _game.chosenAttack.damage / 2;
+        sprites.ps2.health = _game.playerTwoHealth;
         if (_game.playerTwoHealth <= 0) {
           _game.playerTwoHealth = 0;
+          sprites.ps2.health = _game.playerTwoHealth;
           reset({state:'gameOver'});
         }
         else {
@@ -220,8 +266,10 @@ function game() {
       }
       else {
         _game.playerOneHealth -= _game.chosenAttack.damage / 2;
+        sprites.ps1.health = _game.playerOneHealth;
         if (_game.playerOneHealth <= 0) {
           _game.playerOneHealth = 0;
+          sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
         }
         else {
@@ -230,11 +278,14 @@ function game() {
       }
     }
     else if (_game.state == 'attackSuccess') {
+      sprites.ball.show = false;
       var _continue = true;
       if (_game.defender === 1) {
         _game.playerOneHealth -= _game.chosenAttack.damage;
+        sprites.ps1.health = _game.playerOneHealth;
         if (_game.playerOneHealth <= 0) {
           _game.playerOneHealth = 0;
+          sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
@@ -242,8 +293,10 @@ function game() {
       }
       else {
         _game.playerTwoHealth -= _game.chosenAttack.damage;
+        sprites.ps2.health = _game.playerTwoHealth;
         if (_game.playerTwoHealth <= 0) {
           _game.playerTwoHealth = 0;
+          sprites.ps2.health = _game.playerTwoHealth;
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
@@ -276,13 +329,13 @@ function game() {
   function player(x, y, _keystroke) {
   		var score = 0;
 
-  		//ctx.font = '100px sans-serif';
-
   		return {
   			draw: function() {
-          ctx.fillStyle = 'rgba(240,240,240,0.75)';
-          text(_keystroke.getLetter(), x, y, 'center', '400px');
-          ctx.fillStyle = 'rgb(255,255,255)';
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'black';
+          text(_keystroke.getLetter(), x, y, 'center', '400px', 'rgba(255,255,255,0.8)');
+          ctx.strokeText(_keystroke.getLetter(), x, y);
+          ctx.lineWidth = 0;
   			},
   			getScore: function() {
   				return score;
@@ -319,79 +372,311 @@ function game() {
     }
   }
 
-  function text(msg, x, y, align, size) {
+  function text(msg, x, y, align, size, colour) {
     if (align !== undefined) {
       ctx.textAlign = align;
     }
+
+    if (colour === undefined) {
+      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.shadowColor = 'white';
+    }
+    else {
+      ctx.fillStyle = colour;
+      ctx.shadowColor = colour;
+    }
+
     ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
+    ctx.shadowBlur = 10;
     ctx.fillText(msg, x, y);
+    ctx.shadowBlur = 0;
   }
 
   function draw() {
-    backgroundOne(ctx);
-    backgroundTwo(ctx);
-    sun(ctx);
+    //backgroundOne(ctx);
+    //backgroundTwo(ctx);
+
+    // stars
+    sprites.stars.forEach(function (s) {
+      s.draw();
+    });
+    sprites.ball.draw();
+    sprites.ball.drawReflection();
+    sprites.m.draw();
+    sprites.g.draw();
+
+    sprites.ps1.draw();
+    sprites.ps1.drawReflection();
+
+    sprites.ps2.draw();
+    sprites.ps2.drawReflection();
+
+    sprites.w.draw();
   }
 }
 
-// paths!
-function backgroundOne(ctx) {
-	ctx.fillStyle = 'rgb(225,225,225)';
-	var p = new Path2D();
-	p.moveTo(0, 200);
-	p.lineTo(175, 150);
-	p.lineTo(225, 175);
-	p.lineTo(300, 215);
-	p.lineTo(350, 195);
-	p.lineTo(400, 135);
-	p.lineTo(425, 120);
-	p.lineTo(429, 175);
-	p.lineTo(500, 230);
-	p.lineTo(600, 275);
-	p.lineTo(650, 200);
-	p.lineTo(675, 170);
-	p.lineTo(700, 190);
-	p.lineTo(810, 166);
-	p.lineTo(850, 150);
-	p.lineTo(900, 170);
-	p.lineTo(960, 165);
-	p.lineTo(960, 540);
-	p.lineTo(0, 540);
-	ctx.fill(p);
+function moon(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    radius: 40,
+    draw: function() {
+      // bright side
+      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.shadowColor = 'rgba(255,255,255,0.8)';
+      ctx.shadowBlur = 30;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // dark side
+      ctx.fillStyle = 'rgb(0,0,0)';
+      ctx.beginPath();
+      ctx.arc(this.x + 10, this.y - 10, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    }
+  };
 }
 
-function backgroundTwo(ctx) {
-	ctx.fillStyle = 'rgb(200,200,200)';
-	var p = new Path2D();
-	p.moveTo(0,180);
-	p.lineTo(100, 300);
-	p.lineTo(225, 350);
-	p.lineTo(350, 375);
-	p.lineTo(400, 310);
-	p.lineTo(460, 225);
-	p.lineTo(575, 185);
-	p.lineTo(645, 237);
-	p.lineTo(760, 270);
-	p.lineTo(820, 312);
-	p.lineTo(960, 250);
-	p.lineTo(960, 540);
-	p.lineTo(0, 540);
-	ctx.fill(p);
+function attackBall(ctx, x, y, radius, speed, player) {
+  var initialX = x;
+  return {
+    x: x,
+    y: y,
+    speed: speed,
+    player: player,
+    radius: radius,
+    show: false,
+    colour: 'rgb(255,255,255)',
+    gradient: this.colour,
+    setPlayer: function(plyr) {
+      this.player = plyr;
+      this.x = this.player === 1 ? 180 : 780;
+    },
+    setAttack: function(attack) {
+      this.colour = attack.colour;
+      this.radius = attack.damage;
+    },
+    updateGradient: function() {
+      this.gradient = ctx.createRadialGradient(this.x, this.y, 5, this.x, this.y, this.radius * 0.9);
+      this.gradient.addColorStop(0, 'white');
+      this.gradient.addColorStop(1, this.colour);
+    },
+    draw: function() {
+      if (this.show) {
+        this.updateGradient();
+        this.shadowColor = this.colour;
+        this.shadowBlur = 40;
+        ctx.fillStyle = this.gradient;//this.colour; //'rgb(255,0,0)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+        this.shadowBlur = 0;
+      }
+    },
+    drawReflection: function() {
+      if (this.show) {
+        ctx.fillStyle = this.gradient;//this.colour;
+        ctx.shadowColor = this.colour;
+        ctx.shadowBlur = 30;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y + 170, this.radius, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    },
+    update: function() {
+      if (this.show) {
+        this.x += this.player === 1 ? this.speed : this.speed * -1;
+      }
+      else {
+        //this.x = this.player === 1 ? 180;
+      }
+    }
+  };
 }
 
-function sun(ctx) {
-	ctx.fillStyle = 'rgb(230,230,230)';
-	ctx.beginPath();
-	ctx.arc(800, 50, 40, 0, Math.PI * 2, true);
-	ctx.closePath();
-	ctx.fill();
+function star(ctx, x, y) {
+  return {
+    x: x,
+    y: y,
+    radius: rnd(1,3),
+    draw: function() {
+      ctx.fillStyle = 'rgb(255,255,255)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    }
+  };
+}
+
+function starField(ctx, num) {
+  var stars = [];
+  for (var i = 0; i < num; i++) {
+    var x = rnd(0, 960);
+    var y = rnd(0, 540);
+    stars.push(star(ctx, x, y));
+  }
+  return stars;
+}
+
+function ground(ctx, x, y, offset) {
+  var originalY = y;
+  return {
+    x: x,
+    y: y + offset,
+    height: 10,
+    draw: function() {
+      ctx.fillStyle = 'rgb(99,99,99)';
+      ctx.fillRect(this.x, this.y, canvas.width, this.height);
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
+    }
+  };
+}
+
+function water(ctx, x, y, offset) {
+  var originalY = y;
+  return {
+    x: x,
+    y: y + offset,
+    height: 70,
+    draw: function() {
+      //var grad = ctx.createLinearGradient(480,420,480,490);
+      var grad = ctx.createLinearGradient(canvas.width/2, this.y, canvas.width/2, this.y+this.height);
+      grad.addColorStop(0, 'rgba(0,0,0,1)');
+      grad.addColorStop(0.5, 'rgba(0,0,0,0.4)');
+      grad.addColorStop(0.6, 'rgba(0,0,0,0.2)');
+      grad.addColorStop(0.65, 'rgba(0,0,0,0.1)');
+      grad.addColorStop(0.7, 'rgba(0,0,0,0.05)');
+      grad.addColorStop(0.75, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.rect(this.x, this.y, canvas.width, this.height);
+      ctx.fill();
+      ctx.fillStyle = 'black';
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
+    }
+  };
+}
+
+function playerSprite(ctx, x, y, offset, number) {
+  var originalY = y;
+  var dir = number === 2 ? -1 : 1;
+  return {
+    x: x,
+    y: y + offset,
+    health: 100,
+    draw: function() {
+      var p = new Path2D();
+      ctx.fillStyle = 'rgb(255,255,255)';
+      // health
+      //ctx.fillRect(this.x - 50, this.y - 130, 100, 10);
+      ctx.shadowColor = 'white';
+      ctx.shadowBlur = 10;
+
+      // body
+      p.moveTo(this.x, this.y);
+      p.lineTo(this.x - (40 * dir), this.y);
+      p.lineTo(this.x - (10 * dir), this.y - 100);
+      p.lineTo(this.x + (20 * dir), this.y - 100);
+      p.lineTo(this.x + (30 * dir), this.y);
+      // left leg
+      p.moveTo(this.x - (10 * dir), this.y);
+      p.lineTo(this.x - (12 * dir), this.y + 30);
+      p.lineTo(this.x - (20 * dir), this.y + 30);
+      p.lineTo(this.x - (18 * dir), this.y);
+      // right leg
+      p.moveTo(this.x + (15 * dir), this.y);
+      p.lineTo(this.x + (15 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y + 30);
+      p.lineTo(this.x + (7 * dir), this.y);
+
+      ctx.fill(p);
+      ctx.shadowBlur = 0;
+
+      // hood
+      var h = new Path2D();
+      ctx.fillStyle = 'rgb(40,40,40)';
+      h.moveTo(this.x + (17 * dir), this.y - 98);
+      h.lineTo(this.x + (19 * dir), this.y - 75);
+      h.lineTo(this.x + (4 * dir), this.y - 75);
+      h.lineTo(this.x + (9 * dir), this.y - 98);
+      ctx.fill(h);
+    },
+    drawReflection: function() {
+      var p = new Path2D();
+      // body
+      //ctx.translate(0, 820);
+      //ctx.scale(1, -1);
+      ctx.fillStyle = 'rgba(255,255,255,' + this.health / 100 + ')';
+      ctx.shadowColor = 'rgba(255,255,255,' + this.health / 100 + ')';
+      ctx.shadowBlur = 20;
+      var _y = this.y + 70;
+      p.moveTo(this.x, _y);
+      p.lineTo(this.x - (40 * dir), _y);
+      p.lineTo(this.x - (10 * dir), _y + 100);
+      p.lineTo(this.x + (20 * dir), _y + 100);
+      p.lineTo(this.x + (30 * dir), _y);
+      // left leg
+      p.moveTo(this.x - (10 * dir), _y);
+      p.lineTo(this.x - (12 * dir), _y - 30);
+      p.lineTo(this.x - (20 * dir), _y - 30);
+      p.lineTo(this.x - (18 * dir), _y);
+      // right leg
+      p.moveTo(this.x + (15 * dir), _y);
+      p.lineTo(this.x + (15 * dir), _y - 30);
+      p.lineTo(this.x + (7 * dir), _y - 30);
+      p.lineTo(this.x + (7 * dir), _y);
+
+      ctx.fill(p);
+      ctx.shadowBlur = 0;
+
+      // hood
+      var h = new Path2D();
+      ctx.fillStyle = 'rgba(40,40,40,' + this.health/100 + ')';
+      h.moveTo(this.x + (17 * dir), _y + 98);
+      h.lineTo(this.x + (19 * dir), _y + 75);
+      h.lineTo(this.x + (4 * dir), _y + 75);
+      h.lineTo(this.x + (9 * dir), _y + 98);
+      ctx.fill(h);
+
+      //ctx.setTransform(1, 0, 0, 1, 0, 0);
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
+    }
+  };
 }
 
 function rnd(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// gulp concat??
 function KeyStroke(initialKey) {
 	this.currentLetter = initialKey; //rnd(65, 90);//this.getRandom(65, 90);
 }

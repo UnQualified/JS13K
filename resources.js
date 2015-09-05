@@ -1,4 +1,4 @@
-function moon(ctx, x, y) {  
+function moon(ctx, x, y) {
   return {
     x: x,
     y: y,
@@ -13,7 +13,7 @@ function moon(ctx, x, y) {
       ctx.closePath();
       ctx.fill();
       ctx.shadowBlur = 0;
-      
+
       // dark side
       ctx.fillStyle = 'rgb(0,0,0)';
       ctx.beginPath();
@@ -81,7 +81,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
         //this.x = this.player === 1 ? 180;
       }
     }
-  }
+  };
 }
 
 function star(ctx, x, y) {
@@ -96,7 +96,7 @@ function star(ctx, x, y) {
       ctx.closePath();
       ctx.fill();
     }
-  }
+  };
 }
 
 function starField(ctx, num) {
@@ -109,40 +109,65 @@ function starField(ctx, num) {
   return stars;
 }
 
-function ground(ctx, x, y) {
+function ground(ctx, x, y, offset) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     height: 10,
     draw: function() {
       ctx.fillStyle = 'rgb(99,99,99)';
       ctx.fillRect(this.x, this.y, canvas.width, this.height);
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
     }
   };
 }
 
-function water(ctx, x, y) {
+function water(ctx, x, y, offset) {
+  var originalY = y;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     height: 70,
     draw: function() {
-      var grad = ctx.createLinearGradient(480,420,480,490);
-      grad.addColorStop(0, 'rgb(0,0,0)');
+      //var grad = ctx.createLinearGradient(480,420,480,490);
+      var grad = ctx.createLinearGradient(canvas.width/2, this.y, canvas.width/2, this.y+this.height);
+      grad.addColorStop(0, 'rgba(0,0,0,1)');
+      grad.addColorStop(0.5, 'rgba(0,0,0,0.4)');
+      grad.addColorStop(0.6, 'rgba(0,0,0,0.2)');
+      grad.addColorStop(0.65, 'rgba(0,0,0,0.1)');
+      grad.addColorStop(0.7, 'rgba(0,0,0,0.05)');
+      grad.addColorStop(0.75, 'rgba(0,0,0,0)');
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad;
       ctx.rect(this.x, this.y, canvas.width, this.height);
       ctx.fill();
       ctx.fillStyle = 'black';
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
     }
   };
 }
 
-function playerSprite(ctx, x, y, number) {
+function playerSprite(ctx, x, y, offset, number) {
+  var originalY = y;
   var dir = number === 2 ? -1 : 1;
   return {
     x: x,
-    y: y,
+    y: y + offset,
     health: 100,
     draw: function() {
       var p = new Path2D();
@@ -151,7 +176,7 @@ function playerSprite(ctx, x, y, number) {
       //ctx.fillRect(this.x - 50, this.y - 130, 100, 10);
       ctx.shadowColor = 'white';
       ctx.shadowBlur = 10;
-      
+
       // body
       p.moveTo(this.x, this.y);
       p.lineTo(this.x - (40 * dir), this.y);
@@ -168,10 +193,10 @@ function playerSprite(ctx, x, y, number) {
       p.lineTo(this.x + (15 * dir), this.y + 30);
       p.lineTo(this.x + (7 * dir), this.y + 30);
       p.lineTo(this.x + (7 * dir), this.y);
-      
+
       ctx.fill(p);
       ctx.shadowBlur = 0;
-      
+
       // hood
       var h = new Path2D();
       ctx.fillStyle = 'rgb(40,40,40)';
@@ -184,42 +209,51 @@ function playerSprite(ctx, x, y, number) {
     drawReflection: function() {
       var p = new Path2D();
       // body
-      ctx.translate(0, 820);
-      ctx.scale(1, -1);
+      //ctx.translate(0, 820);
+      //ctx.scale(1, -1);
       ctx.fillStyle = 'rgba(255,255,255,' + this.health / 100 + ')';
       ctx.shadowColor = 'rgba(255,255,255,' + this.health / 100 + ')';
       ctx.shadowBlur = 20;
-      p.moveTo(this.x, this.y);
-      p.lineTo(this.x - (40 * dir), this.y);
-      p.lineTo(this.x - (10 * dir), this.y - 100);
-      p.lineTo(this.x + (20 * dir), this.y - 100);
-      p.lineTo(this.x + (30 * dir), this.y);
+      var _y = this.y + 70;
+      p.moveTo(this.x, _y);
+      p.lineTo(this.x - (40 * dir), _y);
+      p.lineTo(this.x - (10 * dir), _y + 100);
+      p.lineTo(this.x + (20 * dir), _y + 100);
+      p.lineTo(this.x + (30 * dir), _y);
       // left leg
-      p.moveTo(this.x - (10 * dir), this.y);
-      p.lineTo(this.x - (12 * dir), this.y + 30);
-      p.lineTo(this.x - (20 * dir), this.y + 30);
-      p.lineTo(this.x - (18 * dir), this.y);
+      p.moveTo(this.x - (10 * dir), _y);
+      p.lineTo(this.x - (12 * dir), _y - 30);
+      p.lineTo(this.x - (20 * dir), _y - 30);
+      p.lineTo(this.x - (18 * dir), _y);
       // right leg
-      p.moveTo(this.x + (15 * dir), this.y);
-      p.lineTo(this.x + (15 * dir), this.y + 30);
-      p.lineTo(this.x + (7 * dir), this.y + 30);
-      p.lineTo(this.x + (7 * dir), this.y);
-      
+      p.moveTo(this.x + (15 * dir), _y);
+      p.lineTo(this.x + (15 * dir), _y - 30);
+      p.lineTo(this.x + (7 * dir), _y - 30);
+      p.lineTo(this.x + (7 * dir), _y);
+
       ctx.fill(p);
       ctx.shadowBlur = 0;
-      
+
       // hood
       var h = new Path2D();
       ctx.fillStyle = 'rgba(40,40,40,' + this.health/100 + ')';
-      h.moveTo(this.x + (17 * dir), this.y - 98);
-      h.lineTo(this.x + (19 * dir), this.y - 75);
-      h.lineTo(this.x + (4 * dir), this.y - 75);
-      h.lineTo(this.x + (9 * dir), this.y - 98);
+      h.moveTo(this.x + (17 * dir), _y + 98);
+      h.lineTo(this.x + (19 * dir), _y + 75);
+      h.lineTo(this.x + (4 * dir), _y + 75);
+      h.lineTo(this.x + (9 * dir), _y + 98);
       ctx.fill(h);
-      
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+      //ctx.setTransform(1, 0, 0, 1, 0, 0);
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
     }
-  }
+  };
 }
 
 function rnd(min, max) {
@@ -277,4 +311,3 @@ Attack.prototype.selectedAttack = function(msg) {
 		this.ctx.fillText(msg + ' selected', 20, 100);
 	}
 };
-

@@ -1,5 +1,5 @@
 function game() {
-
+  var TITLE = 'The Odul Mages';
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
   canvas.width = 960;
@@ -15,6 +15,12 @@ function game() {
   var attacks = new Attack(ctx);
 
   var frame = 0;
+  var yOffset = canvas.height * 1.25;
+  var offsetSpeeds = {
+    fast: 2,
+    med: 0.2,
+    slow: 0.1
+  };
   var _game = {
   		state: 'menu',
   		attackingPlayer: null,
@@ -53,14 +59,14 @@ function game() {
   			colour: 'rbg(255,0,255)'
   		}
   };
-  
+
   var sprites = {
     stars: starField(ctx, 30),
-    ball: attackBall(ctx, 180, 320, 40, 5, 1),
-    g: ground(ctx, 0, 400),
-    ps1: playerSprite(ctx, 150, 370), //this.g.y - 30)
-    ps2: playerSprite(ctx, 810, 370, 2),
-    w: water(ctx, 0, 410),
+    ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
+    g: ground(ctx, 0, 400 - 30, yOffset),
+    ps1: playerSprite(ctx, 150, 370 - 30, yOffset), //this.g.y - 30)
+    ps2: playerSprite(ctx, 810, 370 - 30, yOffset, 2),
+    w: water(ctx, 0, 410 - 30, yOffset),
     m: moon(ctx, 800, 100)
   };
 
@@ -68,7 +74,8 @@ function game() {
   window.addEventListener("keydown", function (event) {
     if (_game.state === 'menu') {
       if (event.keyCode === 32) {
-        _game.start = true;
+        //_game.start = true;
+        _game.state = 'intro';
       }
     }
     else if (_game.state === 'toss') {
@@ -132,6 +139,7 @@ function game() {
 
     // logic
     ctx.fillStyle = 'black';
+    /*
     if (_game.state !== 'menu') {
       //text(_game.state, canvas.width - 200, 20, 'left');
       text('player 1: ' + _game.playerOneHealth, 10, canvas.height - 50);
@@ -139,15 +147,30 @@ function game() {
     }
     else {
       //ctx.font = '52px sans-serif';
-      text('GAME TITLE', centre.x, centre.y - 50, 'center', '52px');
+      text(TITLE.toUpperCase(), centre.x, centre.y - 50, 'center', '52px');
       //ctx.font = '22px sans-serif';
       text('press [space] to start', centre.x, centre.y + 20, 'center');
       if (_game.start) {
         _game.state = 'toss';
       }
-    }
+    }*/
 
-    if (_game.state === 'toss') {
+    if (_game.state === 'menu') {
+      text(TITLE.toUpperCase(), centre.x, centre.y -50, 'center', '52px');
+      text('press [space]', centre.x, centre.y + 20, 'center');
+    }
+    else if (_game.state === 'intro') {
+      text('INTRO', centre.x, centre.y + 100, 'center');
+      sprites.g.reduceOffset(offsetSpeeds.fast);
+      sprites.w.reduceOffset(offsetSpeeds.fast);
+      console.log(sprites.w.y);
+      sprites.ps1.reduceOffset(offsetSpeeds.fast);
+      sprites.ps2.reduceOffset(offsetSpeeds.fast);
+      if (_game.start) {
+        _game.state = 'toss';
+      }
+    }
+    else if (_game.state === 'toss') {
       if (p1.getScore() < DEBUGHEALTH && p2.getScore() < DEBUGHEALTH) {
         p1.draw(ctx);
         p2.draw(ctx);
@@ -203,7 +226,7 @@ function game() {
       frame++;
       var seconds = 60 / _game.chosenAttack.speed * 10;
       text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
-      
+
       sprites.ball.speed = 575 / (seconds / 10) / 10;
       sprites.ball.show = true;
 
@@ -353,7 +376,7 @@ function game() {
     if (align !== undefined) {
       ctx.textAlign = align;
     }
-    
+
     if (colour === undefined) {
       ctx.fillStyle = 'rgb(255,255,255)';
       ctx.shadowColor = 'white';
@@ -362,7 +385,7 @@ function game() {
       ctx.fillStyle = colour;
       ctx.shadowColor = colour;
     }
-    
+
     ctx.font = (size === undefined ? '22px' : size) + ' sans-serif';
     ctx.shadowBlur = 10;
     ctx.fillText(msg, x, y);
@@ -372,7 +395,7 @@ function game() {
   function draw() {
     //backgroundOne(ctx);
     //backgroundTwo(ctx);
-    
+
     // stars
     sprites.stars.forEach(function (s) {
       s.draw();
@@ -384,10 +407,10 @@ function game() {
 
     sprites.ps1.draw();
     sprites.ps1.drawReflection();
-    
+
     sprites.ps2.draw();
     sprites.ps2.drawReflection();
-    
+
     sprites.w.draw();
   }
 }
