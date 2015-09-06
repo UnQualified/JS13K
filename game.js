@@ -90,15 +90,14 @@ function game() {
         availableKeys.keys[keyStroke.currentLetter - 65].available = true;
         keyStroke.assignLetter(availableKeys.getKey());
         p1.updateScore(10);
-        sounds.playSuccess(Math.round(p1.getScore()/10 - 1));
+        sounds.playSuccess(Math.round(p1.getScore()/10 - 1), 1);
       }
       // player 2
       else if (event.keyCode === p2Keys.currentLetter) {
         availableKeys.keys[p2Keys.currentLetter - 65].avaialble = true;
         p2Keys.assignLetter(availableKeys.getKey());
         p2.updateScore(10);
-        // need slightly different sound for player 2...
-        sounds.playSuccess(Math.round(p2.getScore()/10 - 1));
+        sounds.playSuccess(Math.round(p2.getScore()/10 - 1), 2);
       }
     }
     else if (_game.state === 'attackIncoming') {

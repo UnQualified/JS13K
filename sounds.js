@@ -1,24 +1,71 @@
 function Sounds() {
   this.audioContext = new AudioContext();
+  // refactor this!!!
   this.notes = [
-    [-3, 2, 9],
-    [0, 5, 12],
-    [3, 8, 15],
-    [6, 11, 18],
-    [9, 14, 21]
+    {
+      notes: [-3, 2, 9],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [0, 5, 12],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [3, 8, 15],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [6, 11, 18],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [9, 14, 21, 22, 28, 30, 32, 32, 35, 9, 9, 9],
+      delay: 0.1,
+      feedback: 0.6
+    }
+  ];
+  this.p2notes = [
+    {
+      notes: [-5, -2, -1],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [-3, 0, 1],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [-1, 2, 3],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [1, 4, 5],
+      delay: 0.1,
+      feedback: 0.4
+    },
+    {
+      notes: [3, 6, 7, 2, 12, 10, 14, 17, 20, 0, 0, 2, 1],
+      delay: 0.1,
+      feedback: 0.4
+    }
   ];
 }
-Sounds.prototype.playSuccess = function(val) {
+Sounds.prototype.playSuccess = function(val, player) {
   var speed = 0.05;
   var place = 0 - speed;
-  var duration = 0.05;
-  for (var j = 0; j < this.notes[val].length; j++) {
-    this.play(place += speed, this.notes[val][j], duration);
+  var duration = 0.15;//0.05;
+  var notes = player === 1 ? this.notes : this.p2notes;
+  for (var j = 0; j < notes[val].notes.length; j++) {
+    this.play(place += speed, notes[val].notes[j], duration, notes[val]);
   }
 };
-Sounds.prototype.play = function(startAfter, pitch, duration) {
-  //var length = 0.5;
-  //var delay = 0.5;
+Sounds.prototype.play = function(startAfter, pitch, duration, options) {
 
   var time = this.audioContext.currentTime + startAfter;
   var input = this.audioContext.createGain();
@@ -28,8 +75,8 @@ Sounds.prototype.play = function(startAfter, pitch, duration) {
   var output = this.audioContext.createGain();
   output.connect(this.audioContext.destination);
 
-  delay.delayTime.value = 0.1;
-  feedback.gain.value = 0.4; // dangerous when > 1 ;-)
+  delay.delayTime.value = options.delay;
+  feedback.gain.value = options.feedback;//0.4; // dangerous when > 1 ;-)
 
   // dry path
   input.connect(output);
