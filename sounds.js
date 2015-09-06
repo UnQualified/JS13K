@@ -100,5 +100,30 @@ Sounds.prototype.play = function(startAfter, pitch, duration, options) {
   oscillator.stop(time + duration);
 };
 
-//var s = new Sounds();
-//s.playSuccess(4);
+function test() {
+  var audioContext = new AudioContext();
+
+  var oscillator = audioContext.createOscillator();
+  oscillator.type = 'square';
+  oscillator.frequency.value = 220;
+  oscillator.detune.value = 1500;
+  oscillator.connect(audioContext.destination);
+
+
+  //oscillator.start(audioContext.currentTime);
+  //oscillator.stop(audioContext.currentTime + 2);
+
+  var startTime = audioContext.currentTime + 0.100;
+  var tempo = 80;
+  var _8 = (60/tempo) / 2;
+
+  for (var bar = 0; bar < 2; bar++) {
+    var time = startTime + bar * 8 * _8;
+    oscillator.start(time);
+    oscillator.stop(time + _8);
+  }
+
+  /*
+   * http://www.html5rocks.com/en/tutorials/webaudio/intro/
+  */
+}
