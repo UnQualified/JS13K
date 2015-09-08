@@ -319,9 +319,10 @@ AvailableKeys.prototype.getKey = function() {
 	}
 };
 
-function Attack(context) {
+function Attack(context, specialAvailable) {
 	this.ctx = context;
 	this.available = false;
+  this.special = specialAvailable;
 }
 Attack.prototype.displayAttacks = function(canvasCentre) {
 	this.available = true;
@@ -330,8 +331,14 @@ Attack.prototype.displayAttacks = function(canvasCentre) {
   this.ctx.shadowColor = 'white';
 	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
 	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
-	this.ctx.fillText('electric', canvasCentre.x + 100, canvasCentre.y);
+	this.ctx.fillText('electric', canvasCentre.x + 105, canvasCentre.y);
+  if (!this.special) {
+    this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  }
 	this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
+  if (!this.special) {
+    this.ctx.fillStyle = 'white';
+  }
 };
 Attack.prototype.selectedAttack = function(msg) {
 	if (this.available) {

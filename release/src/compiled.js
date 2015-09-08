@@ -32,6 +32,8 @@ function game() {
   		attackingPlayer: null,
   		playerOneHealth: 100,
   		playerTwoHealth: 100,
+      playerOneReversed: 0,
+      playerTwoReversed: 0,
   		tossWinner: null,
   		chosenAttack: null,
   		defender: null,
@@ -131,9 +133,19 @@ function game() {
             _game.chosenAttack = powers.electric;
             break;
           case 83:
-            attacks.available = false;
-            _game.state = 'attack';
-            _game.chosenAttack = powers.special;
+            // this might need to be >= 2
+            if ((_game.defender === 1 && _game.playerTwoReversed >= 3) ||
+                (_game.defender === 2 && _game.playerOneReversed >= 3)) {
+                
+                attacks.available = false;
+                _game.state = 'attack';
+                _game.chosenAttack = powers.special;
+
+                _game.playerTwoReversed = _game.defender === 2 ? 0 : _game.playerTwoReversed;
+                _game.playerOneReversed = _game.defender === 1 ? 0 : _game.playerOneReversed;
+
+                // play bad sound...                
+            }
             break;
           }
         }
@@ -180,6 +192,7 @@ function game() {
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
+          _game.defender = _game.tossWinner === 1 ? 2 : 1;
           sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
@@ -200,7 +213,14 @@ function game() {
       }
     }
     else if (_game.state == 'attackSelection') {
-      attacks.displayAttacks(centre);
+      var specialAvailable = false;
+      // might need to be >= 3
+      if ((_game.defender === 1 && _game.playerTwoReversed >= 2) ||
+          (_game.defender === 2 && _game.playerOneReversed >= 2)) {
+
+          specialAvailable = true;
+      }
+      attacks.displayAttacks(centre, specialAvailable);
       reset();
     }
     else if (_game.state == 'attack') {
@@ -213,7 +233,6 @@ function game() {
       }
     }
     else if (_game.state == 'defense') {
-      _game.defender = _game.tossWinner === 1 ? 2 : 1;
       text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
       frame++;
 
@@ -234,12 +253,14 @@ function game() {
           p1.draw(ctx);
           if (p1.getScore() >= 100) {
             _game.state = 'attackFail';
+            _game.playerOneReversed++;
           }
           break;
         case 2:
           p2.draw(ctx);
           if (p2.getScore() >= 100) {
             _game.state = 'attackFail';
+            _game.playerTwoReversed++;
           }
           break;
       }
@@ -735,9 +756,10 @@ AvailableKeys.prototype.getKey = function() {
 	}
 };
 
-function Attack(context) {
+function Attack(context, specialAvailable) {
 	this.ctx = context;
 	this.available = false;
+  this.special = specialAvailable;
 }
 Attack.prototype.displayAttacks = function(canvasCentre) {
 	this.available = true;
@@ -746,8 +768,14 @@ Attack.prototype.displayAttacks = function(canvasCentre) {
   this.ctx.shadowColor = 'white';
 	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
 	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
-	this.ctx.fillText('electric', canvasCentre.x + 100, canvasCentre.y);
+	this.ctx.fillText('electric', canvasCentre.x + 105, canvasCentre.y);
+  if (!this.special) {
+    this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  }
 	this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
+  if (!this.special) {
+    this.ctx.fillStyle = 'white';
+  }
 };
 Attack.prototype.selectedAttack = function(msg) {
 	if (this.available) {
