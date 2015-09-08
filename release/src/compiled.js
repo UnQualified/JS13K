@@ -97,7 +97,6 @@ function game() {
         availableKeys.keys[p2Keys.currentLetter - 65].avaialble = true;
         p2Keys.assignLetter(availableKeys.getKey());
         p2.updateScore(10);
-        // need slightly different sound for player 2...
         sounds.playSuccess(Math.round(p2.getScore()/10 - 1), 2);
       }
     }
@@ -469,17 +468,12 @@ function attackBall(ctx, x, y, radius, speed, player) {
       this.colour = attack.colour;
       this.radius = attack.damage;
     },
-    updateGradient: function() {
-      this.gradient = ctx.createRadialGradient(this.x, this.y, 5, this.x, this.y, this.radius * 0.9);
-      this.gradient.addColorStop(0, 'white');
-      this.gradient.addColorStop(1, this.colour);
-    },
     draw: function() {
       if (this.show) {
-        this.updateGradient();
-        this.shadowColor = this.colour;
-        this.shadowBlur = 40;
-        ctx.fillStyle = this.gradient;//this.colour; //'rgb(255,0,0)';
+        //this.updateGradient();
+        ctx.fillStyle = this.colour; //'rgb(255,0,0)';
+        ctx.shadowColor = this.colour;
+        ctx.shadowBlur = 40;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
@@ -489,7 +483,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
     },
     drawReflection: function() {
       if (this.show) {
-        ctx.fillStyle = this.gradient;//this.colour;
+        ctx.fillStyle = this.colour;
         ctx.shadowColor = this.colour;
         ctx.shadowBlur = 30;
         ctx.beginPath();
@@ -747,6 +741,9 @@ function Attack(context) {
 }
 Attack.prototype.displayAttacks = function(canvasCentre) {
 	this.available = true;
+  this.ctx.fillStyle = 'white';
+  this.ctx.shadowBlur = 20;
+  this.ctx.shadowColor = 'white';
 	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
 	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
 	this.ctx.fillText('electric', canvasCentre.x + 100, canvasCentre.y);
@@ -822,10 +819,6 @@ Sounds.prototype.playSuccess = function(val, player) {
   var place = 0 - speed;
   var duration = 0.15;//0.05;
   var notes = player === 1 ? this.notes : this.p2notes;
-  /*
-  for (var j = 0; j < this.notes[val].notes.length; j++) {
-    this.play(place += speed, this.notes[val].notes[j], duration, this.notes[val]);
-  }*/
   for (var j = 0; j < notes[val].notes.length; j++) {
     this.play(place += speed, notes[val].notes[j], duration, notes[val]);
   }
@@ -865,5 +858,30 @@ Sounds.prototype.play = function(startAfter, pitch, duration, options) {
   oscillator.stop(time + duration);
 };
 
-//var s = new Sounds();
-//s.playSuccess(4);
+function test() {
+  var audioContext = new AudioContext();
+
+  var oscillator = audioContext.createOscillator();
+  oscillator.type = 'square';
+  oscillator.frequency.value = 220;
+  oscillator.detune.value = 1500;
+  oscillator.connect(audioContext.destination);
+
+
+  //oscillator.start(audioContext.currentTime);
+  //oscillator.stop(audioContext.currentTime + 2);
+
+  var startTime = audioContext.currentTime + 0.100;
+  var tempo = 80;
+  var _8 = (60/tempo) / 2;
+
+  for (var bar = 0; bar < 2; bar++) {
+    var time = startTime + bar * 8 * _8;
+    oscillator.start(time);
+    oscillator.stop(time + _8);
+  }
+
+  /*
+   * http://www.html5rocks.com/en/tutorials/webaudio/intro/
+  */
+}

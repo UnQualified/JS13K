@@ -52,17 +52,12 @@ function attackBall(ctx, x, y, radius, speed, player) {
       this.colour = attack.colour;
       this.radius = attack.damage;
     },
-    updateGradient: function() {
-      this.gradient = ctx.createRadialGradient(this.x, this.y, 5, this.x, this.y, this.radius * 0.9);
-      this.gradient.addColorStop(0, 'white');
-      this.gradient.addColorStop(1, this.colour);
-    },
     draw: function() {
       if (this.show) {
-        this.updateGradient();
-        this.shadowColor = this.colour;
-        this.shadowBlur = 40;
-        ctx.fillStyle = this.gradient;//this.colour; //'rgb(255,0,0)';
+        //this.updateGradient();
+        ctx.fillStyle = this.colour; //'rgb(255,0,0)';
+        ctx.shadowColor = this.colour;
+        ctx.shadowBlur = 40;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.closePath();
@@ -72,7 +67,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
     },
     drawReflection: function() {
       if (this.show) {
-        ctx.fillStyle = this.gradient;//this.colour;
+        ctx.fillStyle = this.colour;
         ctx.shadowColor = this.colour;
         ctx.shadowBlur = 30;
         ctx.beginPath();
@@ -330,6 +325,9 @@ function Attack(context) {
 }
 Attack.prototype.displayAttacks = function(canvasCentre) {
 	this.available = true;
+  this.ctx.fillStyle = 'white';
+  this.ctx.shadowBlur = 20;
+  this.ctx.shadowColor = 'white';
 	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
 	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
 	this.ctx.fillText('electric', canvasCentre.x + 100, canvasCentre.y);
