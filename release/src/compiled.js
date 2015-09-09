@@ -428,10 +428,10 @@ function game() {
     sprites.m.draw();
     sprites.g.draw();
 
-    sprites.ps1.draw(_game.playerOneReversed);
+    sprites.ps1.draw(_game.playerOneReversed, _game.playerOneHealth);
     sprites.ps1.drawReflection();
 
-    sprites.ps2.draw(_game.playerTwoReversed);
+    sprites.ps2.draw(_game.playerTwoReversed, _game.playerTwoHealth);
     sprites.ps2.drawReflection();
 
     sprites.w.draw();
@@ -655,7 +655,7 @@ function playerSprite(ctx, x, y, offset, number) {
     y: y + offset,
     health: 100,
     scrollComplete: false,
-    draw: function(reversals) {
+    draw: function(reversals, health) {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
       // health
@@ -697,6 +697,11 @@ function playerSprite(ctx, x, y, offset, number) {
           ctx.fill();
         }
       }
+
+      // draw the health bar
+      ctx.fillStyle = 'white';
+      ctx.fillRect(this.x - (dir * 70), this.y, 10, health * -1);
+
 
       // hood
       var h = new Path2D();
