@@ -215,7 +215,7 @@ function playerSprite(ctx, x, y, offset, number) {
     y: y + offset,
     health: 100,
     scrollComplete: false,
-    draw: function() {
+    draw: function(reversals) {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
       // health
@@ -242,6 +242,21 @@ function playerSprite(ctx, x, y, offset, number) {
 
       ctx.fill(p);
       ctx.shadowBlur = 0;
+
+      // draw the special counter
+      if (reversals > 0) {
+        reversals = reversals > 3 ? 3 : reversals;
+        var rad = 7;
+        for (var i = 1; i <= reversals; i++) {
+          ctx.fillStyle = 'white';
+          ctx.shadowColor = 'white';
+          ctx.shadowBlur = 15;
+          ctx.beginPath();
+          ctx.arc(this.x - (dir * 45), this.y - 20 - (i * 20), rad, 0, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
 
       // hood
       var h = new Path2D();

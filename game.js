@@ -428,10 +428,10 @@ function game() {
     sprites.m.draw();
     sprites.g.draw();
 
-    sprites.ps1.draw();
+    sprites.ps1.draw(_game.playerOneReversed);
     sprites.ps1.drawReflection();
 
-    sprites.ps2.draw();
+    sprites.ps2.draw(_game.playerTwoReversed);
     sprites.ps2.drawReflection();
 
     sprites.w.draw();
