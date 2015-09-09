@@ -75,6 +75,7 @@ function game() {
     ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset), //this.g.y - 30)
     ps2: playerSprite(ctx, 810, 370 - 30, offsets.yOffset, 2),
     w: water(ctx, 0, 410 - 30, offsets.yOffset),
+    mod: modesty(ctx, 0, 380, offsets.yOffset),
     m: moon(ctx, 800, 100, offsets.medYOffset)
   };
 
@@ -167,6 +168,7 @@ function game() {
     else if (_game.state === 'intro') {
       text('INTRO', centre.x, centre.y + 100, 'center');
       sprites.g.reduceOffset(offsetSpeeds.fast);
+      sprites.mod.reduceOffset(offsetSpeeds.fast);
       sprites.w.reduceOffset(offsetSpeeds.fast);
       sprites.ps1.reduceOffset(offsetSpeeds.fast);
       sprites.ps2.reduceOffset(offsetSpeeds.fast);
@@ -420,6 +422,7 @@ function game() {
     sprites.stars.forEach(function (s) {
       s.draw();
     });
+    sprites.mod.draw();
     sprites.ball.draw();
     sprites.ball.drawReflection();
     sprites.m.draw();
@@ -610,6 +613,28 @@ function water(ctx, x, y, offset) {
       ctx.rect(this.x, this.y, canvas.width, this.height);
       ctx.fill();
       ctx.fillStyle = 'black';
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
+    }
+  };
+}
+
+function modesty(ctx, x, y, offset) {
+  var originalY = y;
+  return {
+    x: x,
+    y: y + offset,
+    height: 250,
+    draw: function() {
+      ctx.fillStyle = 'black';
+      ctx.rect(this.x, this.y, canvas.width, this.height);
+      ctx.fill();
     },
     reduceOffset: function(speed) {
       if (this.y <= originalY) {

@@ -75,6 +75,7 @@ function game() {
     ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset), //this.g.y - 30)
     ps2: playerSprite(ctx, 810, 370 - 30, offsets.yOffset, 2),
     w: water(ctx, 0, 410 - 30, offsets.yOffset),
+    mod: modesty(ctx, 0, 380, offsets.yOffset),
     m: moon(ctx, 800, 100, offsets.medYOffset)
   };
 
@@ -167,6 +168,7 @@ function game() {
     else if (_game.state === 'intro') {
       text('INTRO', centre.x, centre.y + 100, 'center');
       sprites.g.reduceOffset(offsetSpeeds.fast);
+      sprites.mod.reduceOffset(offsetSpeeds.fast);
       sprites.w.reduceOffset(offsetSpeeds.fast);
       sprites.ps1.reduceOffset(offsetSpeeds.fast);
       sprites.ps2.reduceOffset(offsetSpeeds.fast);
@@ -420,6 +422,7 @@ function game() {
     sprites.stars.forEach(function (s) {
       s.draw();
     });
+    sprites.mod.draw();
     sprites.ball.draw();
     sprites.ball.drawReflection();
     sprites.m.draw();

@@ -185,6 +185,28 @@ function water(ctx, x, y, offset) {
   };
 }
 
+function modesty(ctx, x, y, offset) {
+  var originalY = y;
+  return {
+    x: x,
+    y: y + offset,
+    height: 250,
+    draw: function() {
+      ctx.fillStyle = 'black';
+      ctx.rect(this.x, this.y, canvas.width, this.height);
+      ctx.fill();
+    },
+    reduceOffset: function(speed) {
+      if (this.y <= originalY) {
+        this.y = originalY;
+      }
+      else {
+        this.y -= speed;
+      }
+    }
+  };
+}
+
 function playerSprite(ctx, x, y, offset, number) {
   var originalY = y;
   var dir = number === 2 ? -1 : 1;
