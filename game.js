@@ -11,7 +11,8 @@ function game() {
     start: new Date().getTime(),
     now: new Date().getTime(),
     getElapsed: this.now - this.start,
-    started: false
+    started: false,
+    lastCall: new Date().getTime()
   };
 
   var sounds = new Sounds();
@@ -167,7 +168,7 @@ function game() {
   function loop() {
     clear();
     draw();
-    sprites.ball.update();
+    //sprites.ball.update();
 
     // timing - update now counter at beginning of every loop
     time.now = new Date().getTime();
@@ -284,6 +285,7 @@ function game() {
         //console.log('moving into attackincoming phase...');
         time.started = false;
         reset({state:'attackIncoming'});
+        time.lastCall = new Date().getDate();
       }
     }
     else if (_game.state == 'attackIncoming') {
@@ -306,8 +308,18 @@ function game() {
       var _ppm = _distance / _speed;
       time.elapsed = time.now - time.start;
       var _go = (time.elapsed/100) * _ppm;
+      var _t = new Date().getTime() - time.lastCall;
+      if (_t < 1000) {
+        //console.error(_t);
+        sprites.ball.x += _t * _ppm;
+        console.log('X: ' + sprites.ball.x + ' + ' + (_t * _ppm));
+      } else {
+        console.error(_t);
+      }
+      //console.log('X: ' + sprites.ball.x + ' + ' + (_t * _ppm));
+      //sprites.ball.x += _t * _ppm;
       //console.log('ELAPSED: ' + time.elapsed);
-      sprites.ball.speed = _go;//time.elapsed * _ppm;
+      //sprites.ball.speed = _go;//time.elapsed * _ppm;
       sprites.ball.show = true;
       if (time.elapsed >= _game.chosenAttack.time) {
         //console.log('ooouch!!');
@@ -330,6 +342,8 @@ function game() {
           }
           break;
       }
+
+      time.lastCall = new Date().getTime();
 
       //if (frame >= seconds) {
       //  _game.state = 'attackSuccess';
