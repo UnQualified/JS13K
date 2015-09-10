@@ -4,7 +4,7 @@ TODO:
 - Add contextual stuff to the game (intro, player hit, player dead)...
 - Make health and special counter parallel to the reflection
 
-# THE ODUL Mages #
+# THE ODUL MAGES #
 
 There are only two mages who remain on on the Odul plains after their brethren where locked away. They are bound by and ancient vow so must stay together... But they really hate each other. 
 
