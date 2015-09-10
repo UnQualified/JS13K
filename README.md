@@ -20,4 +20,4 @@ If you want to get this running locally to edit or whatever, clone the repo and 
 $ gulp build
 $ gulp zip
 ```
-Zip is optional, but that's how I got it under 13k :rocket:
+Zip is optional, but that's how I got it under 13k as per the rules of JS13K :rocket:
