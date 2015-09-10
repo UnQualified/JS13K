@@ -1,3 +1,9 @@
+TODO:
+
+- Make the frame increments time dependant...
+- Add contextual stuff to the game (intro, player hit, player dead)...
+- Make health and special counter parallel to the reflection
+
 # THE ODUL Mages #
 
 There are only two mages who remain on on the Odul plains after their brethren where locked away. They are bound by and ancient vow so must stay together... But they really hate each other. 
@@ -14,11 +20,4 @@ If you want to get this running locally to edit or whatever, clone the repo and 
 $ gulp build
 $ gulp zip
 ```
-Zip is optional, but that's how I got it under 13k :sweat_smile:
-
-
-TODO:
-
-- Make the frame increments time dependant...
-- Add contextual stuff to the game (intro, player hit, player dead)...
-- Make health and special counter parallel to the reflection
+Zip is optional, but that's how I got it under 13k :rocket:
