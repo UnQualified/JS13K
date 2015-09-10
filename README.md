@@ -4,6 +4,8 @@ TODO:
 - Add contextual stuff to the game (intro, player hit, player dead)...
 - Make health and special counter parallel to the reflection
 
+*The Odul Mages* is a local multiplayer game for two people who must share/fight over the keyboard in order to defeat their foe in this take on a 2D fighting game!
+
 # THE ODUL MAGES #
 
 There are only two mages who remain on on the Odul plains after their brethren where locked away. They are bound by and ancient vow so must stay together... But they really hate each other. 
@@ -14,10 +16,13 @@ Although these reluctant companions detest one another, they respect the rules o
 
 And it just goes on and on until one mage wins. And then it starts again.
 
-## Compiling locally
+### Compiling locally
 If you want to get this running locally to edit or whatever, clone the repo and then `$ npm install` to install all the dependencies. To build, run:
 ```
 $ gulp build
 $ gulp zip
 ```
 Zip is optional, but that's how I got it under 13k as per the rules of JS13K :rocket:
+
+### A note on quality
+The game isn't as polished as I would have liked, and the code is a bit of a mess but it's my first game and I spent **a lot** of time learning how to do this on `<canvas>`. So that aside, the game loop is complete and works so although I ran out of time I still managed to submit it to to JS13K 2015 :smile:
