@@ -9,7 +9,9 @@ function game() {
   var time = {
     elapsed: 0,
     start: new Date().getTime(),
-    now: new Date().getTime()
+    now: new Date().getTime(),
+    getElapsed: this.now - this.start,
+    started: false
   };
 
   var sounds = new Sounds();
@@ -163,10 +165,8 @@ function game() {
     draw();
     sprites.ball.update();
 
-    // timing
+    // timing - update now counter at beginning of every loop
     time.now = new Date().getTime();
-    time.elapsed = time.now - time.start;
-    //console.log(time.elapsed / 1000 + ' seconds');
 
     // logic
     ctx.fillStyle = 'black';
@@ -200,10 +200,15 @@ function game() {
         time.start = new Date().getTime();
       }
       else {
+        if (!time.started) {
+          time.start = new Date().getTime();
+          time.started = true;
+        }
+        time.elapsed = time.now - time.start;
         var winner = '';
-        console.log(time.elapsed);
-        if (time.elapsed > 2000) {//if (frame < 120) {
-          console.log('2 seconds have passed! (' + time.elapsed + ')');
+        //console.log(time.elapsed);
+        if (time.elapsed < 1500) {//if (frame < 120) {
+          console.log('1.5 seconds have passed!');
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
@@ -211,7 +216,8 @@ function game() {
           sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
-        else if (frame < 240) {
+        else if (time.elapsed > 1500 && time.elapsed < 3000) {//frame < 240) {
+          console.log('2.2 seconds have passed');
           winner = 'choose your attack';
           frame++;
         }
@@ -224,6 +230,7 @@ function game() {
         }
         else {
           _game.state = 'attackSelection';
+          time.started = false;
         }
       }
     }
@@ -239,25 +246,45 @@ function game() {
       reset();
     }
     else if (_game.state == 'attack') {
+      // reset the time
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+      }
       sprites.ball.setAttack(_game.chosenAttack);
       var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
       text(aMsg, centre.x, centre.y, 'center');
       frame++;
-      if (frame >= 120) {
+      if (time.elapsed > 1500) {//frame >= 120) {
+        console.log('1500 milliseconds have passed!');
+        time.started = false;
         reset({state:'defense'});
       }
     }
     else if (_game.state == 'defense') {
       text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
       frame++;
+      // reset the time
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+      }
 
-      if (frame >= 120) {
+      if (time.elapsed > 1000) {//frame >= 120) {
+        console.log('moving into attackincoming phase...');
+        time.started = false;
         reset({state:'attackIncoming'});
       }
     }
     else if (_game.state == 'attackIncoming') {
+      // reset the time
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+      }
       frame++;
-      var seconds = 60 / _game.chosenAttack.speed * 10;
+      // TIME SPECIFIC STUFF HERE!!!
+      var seconds = 60 / _game.chosenAttack.speed * (time.now - time.start);//10;
       text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
 
       sprites.ball.speed = 575 / (seconds / 10) / 10;
