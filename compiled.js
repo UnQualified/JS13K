@@ -6,6 +6,11 @@ function game() {
   canvas.height = 540;
   //canvas.style.backgroundColor = 'rgb(0,0,0)';
   var centre = getCanvasCentre();
+  var time = {
+    elapsed: 0,
+    start: new Date().getTime(),
+    now: new Date().getTime()
+  };
 
   var sounds = new Sounds();
 
@@ -137,7 +142,7 @@ function game() {
             // this might need to be >= 2
             if ((_game.defender === 1 && _game.playerTwoReversed >= 3) ||
                 (_game.defender === 2 && _game.playerOneReversed >= 3)) {
-                
+
                 attacks.available = false;
                 _game.state = 'attack';
                 _game.chosenAttack = powers.special;
@@ -145,7 +150,7 @@ function game() {
                 _game.playerTwoReversed = _game.defender === 2 ? 0 : _game.playerTwoReversed;
                 _game.playerOneReversed = _game.defender === 1 ? 0 : _game.playerOneReversed;
 
-                // play bad sound...                
+                // play bad sound...
             }
             break;
           }
@@ -157,6 +162,11 @@ function game() {
     clear();
     draw();
     sprites.ball.update();
+
+    // timing
+    time.now = new Date().getTime();
+    time.elapsed = time.now - time.start;
+    //console.log(time.elapsed / 1000 + ' seconds');
 
     // logic
     ctx.fillStyle = 'black';
@@ -187,10 +197,13 @@ function game() {
       if (p1.getScore() < DEBUGHEALTH && p2.getScore() < DEBUGHEALTH) {
         p1.draw(ctx);
         p2.draw(ctx);
+        time.start = new Date().getTime();
       }
       else {
         var winner = '';
-        if (frame < 120) {
+        console.log(time.elapsed);
+        if (time.elapsed > 2000) {//if (frame < 120) {
+          console.log('2 seconds have passed! (' + time.elapsed + ')');
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
