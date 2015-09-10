@@ -44,6 +44,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
     show: false,
     colour: 'rgb(255,255,255)',
     gradient: this.colour,
+    speedSet: false,
     setPlayer: function(plyr) {
       this.player = plyr;
       this.x = this.player === 1 ? 180 : 780;

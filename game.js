@@ -51,27 +51,31 @@ function game() {
   var powers = {
   		water: {
   			type: 'water',
-  			speed: 2,
+  			speed: 7,
   			damage: 30,
-  			colour: 'rgb(0,0,255)'
+  			colour: 'rgb(0,0,255)',
+        time: 4900
   		},
   		fire: {
   			type: 'fire',
-  			speed: 1,
+  			speed: 10,
   			damage: 40,
-  			colour: 'rgb(255,0,0)'
+  			colour: 'rgb(255,0,0)',
+        time: 6000
   		},
   		electric: {
   			type: 'electric',
-  			speed: 3,
+  			speed: 4,
   			damage: 15,
-  			colour: 'rgb(255,255,0)'
+  			colour: 'rgb(255,255,0)',
+        time: 3750
   		},
   		special: {
   			type: 'special',
-  			speed: 2,
+  			speed: 5,
   			damage: 50,
-  			colour: 'rbg(255,0,255)'
+  			colour: 'rbg(255,0,255)',
+        time: 4000
   		}
   };
 
@@ -167,6 +171,7 @@ function game() {
 
     // timing - update now counter at beginning of every loop
     time.now = new Date().getTime();
+    //console.log('ELAPSED: ' + time.elapsed);
 
     // logic
     ctx.fillStyle = 'black';
@@ -201,6 +206,7 @@ function game() {
       }
       else {
         if (!time.started) {
+          time.elapsed = 0;
           time.start = new Date().getTime();
           time.started = true;
         }
@@ -208,7 +214,7 @@ function game() {
         var winner = '';
         //console.log(time.elapsed);
         if (time.elapsed < 1500) {//if (frame < 120) {
-          console.log('1.5 seconds have passed!');
+          //console.log('1.5 seconds have passed!');
           frame++;
           winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
@@ -216,8 +222,8 @@ function game() {
           sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
-        else if (time.elapsed > 1500 && time.elapsed < 3000) {//frame < 240) {
-          console.log('2.2 seconds have passed');
+        else if (time.elapsed < 3000) {//frame < 240) {
+          //console.log('2.2 seconds have passed');
           winner = 'choose your attack';
           frame++;
         }
@@ -248,15 +254,17 @@ function game() {
     else if (_game.state == 'attack') {
       // reset the time
       if (!time.started) {
+        time.elapsed = 0;
         time.start = new Date().getTime();
         time.started = true;
       }
+      time.elapsed = time.now - time.start;
       sprites.ball.setAttack(_game.chosenAttack);
       var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
       text(aMsg, centre.x, centre.y, 'center');
       frame++;
       if (time.elapsed > 1500) {//frame >= 120) {
-        console.log('1500 milliseconds have passed!');
+        //console.log('1500 milliseconds have passed!');
         time.started = false;
         reset({state:'defense'});
       }
@@ -266,12 +274,14 @@ function game() {
       frame++;
       // reset the time
       if (!time.started) {
+        time.elapsed = 0;
         time.start = new Date().getTime();
         time.started = true;
       }
+      time.elapsed = time.now - time.start;
 
-      if (time.elapsed > 1000) {//frame >= 120) {
-        console.log('moving into attackincoming phase...');
+      if (time.elapsed > 1500) {//frame >= 120) {
+        //console.log('moving into attackincoming phase...');
         time.started = false;
         reset({state:'attackIncoming'});
       }
@@ -279,16 +289,30 @@ function game() {
     else if (_game.state == 'attackIncoming') {
       // reset the time
       if (!time.started) {
+        time.elapsed = 0;
         time.start = new Date().getTime();
         time.started = true;
       }
       frame++;
+      time.elapsed = time.now - time.start;
       // TIME SPECIFIC STUFF HERE!!!
       var seconds = 60 / _game.chosenAttack.speed * (time.now - time.start);//10;
-      text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
+      //text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
+      text(time.elapsed, centre.x, canvas.height - 50, 'center');
 
-      sprites.ball.speed = 575 / (seconds / 10) / 10;
+      //sprites.ball.speed = 575 / (seconds / 10) / 10;
+      var _speed = _game.chosenAttack.speed * 1000;
+      var _distance = 575;
+      var _ppm = _distance / _speed;
+      time.elapsed = time.now - time.start;
+      var _go = (time.elapsed/100) * _ppm;
+      //console.log('ELAPSED: ' + time.elapsed);
+      sprites.ball.speed = _go;//time.elapsed * _ppm;
       sprites.ball.show = true;
+      if (time.elapsed >= _game.chosenAttack.time) {
+        //console.log('ooouch!!');
+        _game.state = 'attackSuccess';
+      }
 
       switch (_game.defender) {
         case 1:
@@ -307,9 +331,9 @@ function game() {
           break;
       }
 
-      if (frame >= seconds) {
-        _game.state = 'attackSuccess';
-      }
+      //if (frame >= seconds) {
+      //  _game.state = 'attackSuccess';
+      //}
     }
     else if (_game.state == 'attackFail') {
       reset();
