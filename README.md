@@ -25,4 +25,4 @@ $ gulp zip
 Zip is optional, but that's how I got it under 13k as per the rules of JS13K :rocket:
 
 ### A note on quality
-The game isn't as polished as I would have liked, and the code is a bit of a mess but it's my first game and I spent **a lot** of time learning how to do this on `<canvas>`. So that aside, the game loop is complete and works so although I ran out of time I still managed to submit it to to JS13K 2015 :smile:
+The game isn't as polished as I would have liked, and the code is a bit of a mess but it's my first game and I spent **a lot** of time learning how to do this on `<canvas>`. So that aside, the game loop is complete and works so although I ran out of time I still managed to submit it to to JS13K 2015 - the best thing about this jam is that it got me thinking and forced me to actually call something 'good enough' and submit it! :smile:
