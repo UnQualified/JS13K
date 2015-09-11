@@ -17,7 +17,7 @@ Although these reluctant companions detest one another, they respect the rules o
 And it just goes on and on until one mage wins. And then it starts again.
 
 ### Compiling locally
-If you want to get this running locally to edit or whatever, clone the repo and then `$ npm install` to install all the dependencies. To build, run:
+If you want to build the minified versions of the code, clone the repo and then `$ npm install` to install all the dependencies. Then run:
 ```
 $ gulp build
 $ gulp zip
