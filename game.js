@@ -245,12 +245,13 @@ function game() {
     }
     else if (_game.state == 'attackSelection') {
       var specialAvailable = false;
-      // might need to be >= 3
-      if ((_game.defender === 1 && _game.playerTwoReversed >= 2) ||
-          (_game.defender === 2 && _game.playerOneReversed >= 2)) {
-
-          specialAvailable = true;
+      if (_game.defender === 1 && _game.playerTwoReversed > 2) {
+        specialAvailable = true;
       }
+      else if (_game.defender === 2 && _game.playerOneReversed > 2) {
+        specialAvailable = true;
+      }
+      console.log('specialAvailable: ', specialAvailable);
       attacks.displayAttacks(centre, specialAvailable);
       reset();
     }
@@ -273,7 +274,13 @@ function game() {
       }
     }
     else if (_game.state == 'defense') {
-      text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+      if (_game.chosenAttack.type !== 'special') {
+        text('mage ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+      }
+      else {
+        var txt = 'uh oh. may the blessings of the mages be with you...';
+        text(txt, centre.x, centre.y, 'center');
+      }
       frame++;
       // reset the time
       if (!time.started) {
@@ -340,25 +347,27 @@ function game() {
         _game.state = 'attackSuccess';
       }
 
-      switch (_game.defender) {
-        case 1:
-          p1.draw(ctx);
-          if (p1.getScore() >= DEBUGHEALTH) {//100) {
-            _game.state = 'reversing'; //'attackFail';
-            _game.playerOneReversed++;
+      if (_game.chosenAttack.type != 'special') {
+        switch (_game.defender) {
+          case 1:
+            p1.draw(ctx);
+            if (p1.getScore() >= DEBUGHEALTH) {//100) {
+              _game.state = 'reversing'; //'attackFail';
+              _game.playerOneReversed++;
 
-            time.started = false;
-          }
-          break;
-        case 2:
-          p2.draw(ctx);
-          if (p2.getScore() >= DEBUGHEALTH) {//100) {
-            _game.state = 'reversing'; //'attackFail';
-            _game.playerTwoReversed++;
+              time.started = false;
+            }
+            break;
+          case 2:
+            p2.draw(ctx);
+            if (p2.getScore() >= DEBUGHEALTH) {//100) {
+              _game.state = 'reversing'; //'attackFail';
+              _game.playerTwoReversed++;
 
-            time.started = false;
-          }
-          break;
+              time.started = false;
+            }
+            break;
+        }
       }
 
       // update the last call time

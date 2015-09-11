@@ -245,12 +245,13 @@ function game() {
     }
     else if (_game.state == 'attackSelection') {
       var specialAvailable = false;
-      // might need to be >= 3
-      if ((_game.defender === 1 && _game.playerTwoReversed >= 2) ||
-          (_game.defender === 2 && _game.playerOneReversed >= 2)) {
-
-          specialAvailable = true;
+      if (_game.defender === 1 && _game.playerTwoReversed > 2) {
+        specialAvailable = true;
       }
+      else if (_game.defender === 2 && _game.playerOneReversed > 2) {
+        specialAvailable = true;
+      }
+      console.log('specialAvailable: ', specialAvailable);
       attacks.displayAttacks(centre, specialAvailable);
       reset();
     }
@@ -273,7 +274,9 @@ function game() {
       }
     }
     else if (_game.state == 'defense') {
-      text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+      if (_game.chosenAttack.type !== 'special') {
+        text('player ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+      }
       frame++;
       // reset the time
       if (!time.started) {
@@ -340,25 +343,27 @@ function game() {
         _game.state = 'attackSuccess';
       }
 
-      switch (_game.defender) {
-        case 1:
-          p1.draw(ctx);
-          if (p1.getScore() >= DEBUGHEALTH) {//100) {
-            _game.state = 'reversing'; //'attackFail';
-            _game.playerOneReversed++;
+      if (_game.chosenAttack.type != 'special') {
+        switch (_game.defender) {
+          case 1:
+            p1.draw(ctx);
+            if (p1.getScore() >= DEBUGHEALTH) {//100) {
+              _game.state = 'reversing'; //'attackFail';
+              _game.playerOneReversed++;
 
-            time.started = false;
-          }
-          break;
-        case 2:
-          p2.draw(ctx);
-          if (p2.getScore() >= DEBUGHEALTH) {//100) {
-            _game.state = 'reversing'; //'attackFail';
-            _game.playerTwoReversed++;
+              time.started = false;
+            }
+            break;
+          case 2:
+            p2.draw(ctx);
+            if (p2.getScore() >= DEBUGHEALTH) {//100) {
+              _game.state = 'reversing'; //'attackFail';
+              _game.playerTwoReversed++;
 
-            time.started = false;
-          }
-          break;
+              time.started = false;
+            }
+            break;
+        }
       }
 
       // update the last call time
@@ -964,12 +969,11 @@ AvailableKeys.prototype.getKey = function() {
   }
 };
 
-function Attack(context, specialAvailable) {
+function Attack(context) {
 	this.ctx = context;
 	this.available = false;
-  this.special = specialAvailable;
 }
-Attack.prototype.displayAttacks = function(canvasCentre) {
+Attack.prototype.displayAttacks = function(canvasCentre, special) {
 	this.available = true;
   this.ctx.fillStyle = 'white';
   this.ctx.shadowBlur = 20;
@@ -977,12 +981,8 @@ Attack.prototype.displayAttacks = function(canvasCentre) {
 	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
 	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
 	this.ctx.fillText('electric', canvasCentre.x + 105, canvasCentre.y);
-  if (!this.special) {
-    this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  }
-	this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
-  if (!this.special) {
-    this.ctx.fillStyle = 'white';
+  if (special) {
+    this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
   }
 };
 Attack.prototype.selectedAttack = function(msg) {
