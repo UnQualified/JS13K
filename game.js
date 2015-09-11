@@ -306,8 +306,23 @@ function game() {
       if (timeLeft > 0) {
         // how far is left to go?
         var distanceToCover = 600;
-        var endPoint = sprites.ball.getInitialX() + distanceToCover;
-        var remainingDistance = endPoint - sprites.ball.x;
+        //var endPoint = sprites.ball.initialX + distanceToCover;
+        var endPoint = 0;
+        var remainingDistance = 0;
+        if (_game.defender === 2) {
+          sprites.ball.initialX = 180;
+          endPoint = sprites.ball.initialX + distanceToCover;
+          remainingDistance = endPoint - sprites.ball.x;
+        }
+        else {
+          sprites.ball.initialX = 780;
+          console.log(sprites.ball.initialX);
+          endPoint = sprites.ball.initialX - distanceToCover;
+          console.log('endPoint: ', endPoint);
+          remainingDistance = sprites.ball.x - endPoint;
+          console.log('remainingDistance: ', remainingDistance);
+        }
+        //var remainingDistance = endPoint - sprites.ball.x;
 
         // how many pixels should x move at the current speed?
         var ppms = remainingDistance / timeLeft;
@@ -315,14 +330,23 @@ function game() {
         // update x relative to framerate
         // THIS IS WHERE THE ISSUE IS
         // see where x is currently...
-        console.log('x: ', sprites.ball.x);
-        console.log('initialX: ', sprites.ball.getIniialX());
-        sprites.ball.x += ppms * time.elapsed;
+        //console.log('x: ', sprites.ball.x);
+        //console.log('initialX: ', sprites.ball.initialX);
+        //console.log('defender: ', _game.defender);
+        sprites.ball.show = true;
+        if (_game.defender === 2) {
+          sprites.ball.x += ppms * time.elapsed;
+        }
+        else {
+          sprites.ball.x -= ppms * time.elapsed;
+        }
       }
       else {
         // attack successful!
         // reverse the attack...
-        console.log('OUT OF TIME');
+        console.log('ouch...');
+        sprites.ball.show = false;
+        _game.state = 'attackSuccess';
       }
 
       /*

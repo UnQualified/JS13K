@@ -37,6 +37,7 @@ function attackBall(ctx, x, y, radius, speed, player) {
   var initialX = x;
   return {
     x: x,
+    initialX: x,
     y: y,
     speed: speed,
     player: player,
