@@ -69,6 +69,20 @@ function Sounds() {
       feedback: 0.65
     }
   ];
+  this.p1death = [
+    {
+      notes: [-40, 0, -35, -5, -20, -18, -23],
+      delay: 0.1,
+      feedback: 0.7
+    }
+  ];
+  this.p2death = [
+    {
+      notes: [-35, -34, -50, -25, -20, -1, -0],
+      delay: 0.1,
+      feedback: 0.7
+    }
+  ];
 }
 Sounds.prototype.playSuccess = function(val, player) {
   var speed = 0.05;
@@ -84,6 +98,15 @@ Sounds.prototype.playOuch = function(player) {
   var place = 0 - speed;
   var duration = 0.15;
   var notes = player === 1 ? this.p1ouch : this.p2ouch;
+  for (var j = 0; j < notes[0].notes.length; j++) {
+    this.play(place += speed, notes[0].notes[j], duration, notes[0]);
+  }
+};
+Sounds.prototype.playDeath = function(player) {
+  var speed = 0.05;
+  var place = 0 - speed;
+  var duration = 0.15;
+  var notes = player === 1 ? this.p1death : this.p2death;
   for (var j = 0; j < notes[0].notes.length; j++) {
     this.play(place += speed, notes[0].notes[j], duration, notes[0]);
   }

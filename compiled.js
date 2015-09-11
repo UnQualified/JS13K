@@ -420,6 +420,7 @@ function game() {
           _game.playerTwoHealth = 0;
           sprites.ps2.health = _game.playerTwoHealth;
           reset({state:'gameOver'});
+          sounds.playDeath(2);
         }
         else {
           sounds.playOuch(2);
@@ -433,6 +434,7 @@ function game() {
           _game.playerOneHealth = 0;
           sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
+          sounds.playDeath(1);
         }
         else {
           sounds.playOuch(1);
@@ -452,6 +454,7 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+          sounds.playDeath(1);
         }
         else {
           sounds.playOuch(1);
@@ -466,6 +469,7 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+          sounds.playDeath(2);
         }
         else {
           sounds.playOuch(2);
@@ -1059,6 +1063,20 @@ function Sounds() {
       feedback: 0.65
     }
   ];
+  this.p1death = [
+    {
+      notes: [-40, 0, -35, -5, -20, -18, -23],
+      delay: 0.1,
+      feedback: 0.7
+    }
+  ];
+  this.p2death = [
+    {
+      notes: [-35, -34, -50, -25, -20, -1, -0],
+      delay: 0.1,
+      feedback: 0.7
+    }
+  ];
 }
 Sounds.prototype.playSuccess = function(val, player) {
   var speed = 0.05;
@@ -1074,6 +1092,15 @@ Sounds.prototype.playOuch = function(player) {
   var place = 0 - speed;
   var duration = 0.15;
   var notes = player === 1 ? this.p1ouch : this.p2ouch;
+  for (var j = 0; j < notes[0].notes.length; j++) {
+    this.play(place += speed, notes[0].notes[j], duration, notes[0]);
+  }
+};
+Sounds.prototype.playDeath = function(player) {
+  var speed = 0.05;
+  var place = 0 - speed;
+  var duration = 0.15;
+  var notes = player === 1 ? this.p1death : this.p2death;
   for (var j = 0; j < notes[0].notes.length; j++) {
     this.play(place += speed, notes[0].notes[j], duration, notes[0]);
   }

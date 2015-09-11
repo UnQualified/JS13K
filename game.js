@@ -420,6 +420,7 @@ function game() {
           _game.playerTwoHealth = 0;
           sprites.ps2.health = _game.playerTwoHealth;
           reset({state:'gameOver'});
+          sounds.playDeath(2);
         }
         else {
           sounds.playOuch(2);
@@ -433,6 +434,7 @@ function game() {
           _game.playerOneHealth = 0;
           sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
+          sounds.playDeath(1);
         }
         else {
           sounds.playOuch(1);
@@ -452,6 +454,7 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+          sounds.playDeath(1);
         }
         else {
           sounds.playOuch(1);
@@ -466,6 +469,7 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+          sounds.playDeath(2);
         }
         else {
           sounds.playOuch(2);
