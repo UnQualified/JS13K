@@ -1,4 +1,6 @@
 /node_modules
 /.sass-cache
+/dist
+/release
 android.html
 scratchpad.js
