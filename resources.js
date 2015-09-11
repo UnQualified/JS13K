@@ -85,6 +85,9 @@ function attackBall(ctx, x, y, radius, speed, player) {
       else {
         //this.x = this.player === 1 ? 180;
       }
+    },
+    getInitialX: function() {
+      return initialX;
     }
   };
 }

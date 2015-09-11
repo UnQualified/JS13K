@@ -291,10 +291,37 @@ function game() {
     else if (_game.state == 'attackIncoming') {
       // reset the time
       if (!time.started) {
-        time.elapsed = 0;
         time.start = new Date().getTime();
         time.started = true;
+        time.lastCall = time.start;
       }
+
+      time.elapsed = new Date().getTime() - time.lastCall;
+
+      // how much time is left??
+      var endTime = new Date().getTime() - _game.chosenAttack.time;
+      var timeLeft = _game.chosenAttack.time - (endTime - time.startTime - _game.chosenAttack.time);
+      // console.log(timeleft)
+
+      if (timeLeft > 0) {
+        // how far is left to go?
+        var distanceToCover = 600;
+        var endPoint = sprites.ball.getInitialX() + distanceToCover;
+        var remainingDistance = endPoint - sprites.ball.x;
+
+        // how many pixels should x move at the current speed?
+        var ppms = remainingDistance / timeLeft;
+
+        // update x relative to framerate
+        sprites.ball.x += ppms * time.elapsed;
+      }
+      else {
+        // attack successful!
+        // reverse the attack...
+        console.log('OUT OF TIME');
+      }
+
+      /*
       frame++;
       time.elapsed = time.now - time.start;
       // TIME SPECIFIC STUFF HERE!!!
@@ -325,7 +352,7 @@ function game() {
         //console.log('ooouch!!');
         _game.state = 'attackSuccess';
       }
-
+      */
       switch (_game.defender) {
         case 1:
           p1.draw(ctx);
@@ -343,11 +370,12 @@ function game() {
           break;
       }
 
-      time.lastCall = new Date().getTime();
-
       //if (frame >= seconds) {
       //  _game.state = 'attackSuccess';
       //}
+
+      // update the last call time
+      time.lastCall = new Date().getTime();
     }
     else if (_game.state == 'attackFail') {
       reset();
@@ -603,6 +631,9 @@ function attackBall(ctx, x, y, radius, speed, player) {
       else {
         //this.x = this.player === 1 ? 180;
       }
+    },
+    getInitialX: function() {
+      return initialX;
     }
   };
 }
