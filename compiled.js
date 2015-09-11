@@ -299,9 +299,9 @@ function game() {
       time.elapsed = new Date().getTime() - time.lastCall;
 
       // how much time is left??
-      var endTime = new Date().getTime() - _game.chosenAttack.time;
-      var timeLeft = _game.chosenAttack.time - (endTime - time.startTime - _game.chosenAttack.time);
-      // console.log(timeleft)
+      var endTime = new Date().getTime() + _game.chosenAttack.time;
+      var timeLeft = _game.chosenAttack.time - (endTime - time.start - _game.chosenAttack.time);
+      //console.log('timeLeft: ', timeLeft);
 
       if (timeLeft > 0) {
         // how far is left to go?
@@ -313,6 +313,10 @@ function game() {
         var ppms = remainingDistance / timeLeft;
 
         // update x relative to framerate
+        // THIS IS WHERE THE ISSUE IS
+        // see where x is currently...
+        console.log('x: ', sprites.ball.x);
+        console.log('initialX: ', sprites.ball.getIniialX());
         sprites.ball.x += ppms * time.elapsed;
       }
       else {
