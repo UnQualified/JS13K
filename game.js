@@ -422,6 +422,7 @@ function game() {
           reset({state:'gameOver'});
         }
         else {
+          sounds.playOuch(2);
           _game.state = 'toss';
         }
       }
@@ -434,6 +435,7 @@ function game() {
           _game.state = 'gameOver';
         }
         else {
+          sounds.playOuch(1);
           _game.state = 'toss';
         }
       }
@@ -451,6 +453,9 @@ function game() {
           frame = 0;
           _continue = false;
         }
+        else {
+          sounds.playOuch(1);
+        }
       }
       else {
         _game.playerTwoHealth -= _game.chosenAttack.damage;
@@ -461,6 +466,9 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+        }
+        else {
+          sounds.playOuch(2);
         }
       }
 

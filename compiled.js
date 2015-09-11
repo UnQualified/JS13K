@@ -422,6 +422,7 @@ function game() {
           reset({state:'gameOver'});
         }
         else {
+          sounds.playOuch(2);
           _game.state = 'toss';
         }
       }
@@ -434,6 +435,7 @@ function game() {
           _game.state = 'gameOver';
         }
         else {
+          sounds.playOuch(1);
           _game.state = 'toss';
         }
       }
@@ -451,6 +453,9 @@ function game() {
           frame = 0;
           _continue = false;
         }
+        else {
+          sounds.playOuch(1);
+        }
       }
       else {
         _game.playerTwoHealth -= _game.chosenAttack.damage;
@@ -461,6 +466,9 @@ function game() {
           _game.state = 'gameOver';
           frame = 0;
           _continue = false;
+        }
+        else {
+          sounds.playOuch(2);
         }
       }
 
@@ -1037,6 +1045,20 @@ function Sounds() {
       feedback: 0.4
     }
   ];
+  this.p1ouch = [
+    {
+      notes: [-15, -10, -12, -17, -17],
+      delay: 0.1,
+      feedback: 0.8
+    }
+  ];
+  this.p2ouch = [
+    {
+      notes: [-32, -25, -22, -15, -30],
+      delay: 0.1,
+      feedback: 0.65
+    }
+  ];
 }
 Sounds.prototype.playSuccess = function(val, player) {
   var speed = 0.05;
@@ -1045,6 +1067,15 @@ Sounds.prototype.playSuccess = function(val, player) {
   var notes = player === 1 ? this.notes : this.p2notes;
   for (var j = 0; j < notes[val].notes.length; j++) {
     this.play(place += speed, notes[val].notes[j], duration, notes[val]);
+  }
+};
+Sounds.prototype.playOuch = function(player) {
+  var speed = 0.05;
+  var place = 0 - speed;
+  var duration = 0.15;
+  var notes = player === 1 ? this.p1ouch : this.p2ouch;
+  for (var j = 0; j < notes[0].notes.length; j++) {
+    this.play(place += speed, notes[0].notes[j], duration, notes[0]);
   }
 };
 Sounds.prototype.play = function(startAfter, pitch, duration, options) {
@@ -1081,31 +1112,3 @@ Sounds.prototype.play = function(startAfter, pitch, duration, options) {
   oscillator.start(time);
   oscillator.stop(time + duration);
 };
-
-function test() {
-  var audioContext = new AudioContext();
-
-  var oscillator = audioContext.createOscillator();
-  oscillator.type = 'square';
-  oscillator.frequency.value = 220;
-  oscillator.detune.value = 1500;
-  oscillator.connect(audioContext.destination);
-
-
-  //oscillator.start(audioContext.currentTime);
-  //oscillator.stop(audioContext.currentTime + 2);
-
-  var startTime = audioContext.currentTime + 0.100;
-  var tempo = 80;
-  var _8 = (60/tempo) / 2;
-
-  for (var bar = 0; bar < 2; bar++) {
-    var time = startTime + bar * 8 * _8;
-    oscillator.start(time);
-    oscillator.stop(time + _8);
-  }
-
-  /*
-   * http://www.html5rocks.com/en/tutorials/webaudio/intro/
-  */
-}
