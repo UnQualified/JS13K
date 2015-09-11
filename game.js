@@ -119,12 +119,14 @@ function game() {
       if (event.keyCode === keyStroke.currentLetter) {
         availableKeys.keys[keyStroke.currentLetter - 65].available = true;
         keyStroke.assignLetter(availableKeys.getKey());
-        p1.updateScore(20);
+        p1.updateScore(10);
+        sounds.playSuccess(Math.round(p1.getScore()/10 - 1), 1);
       }
       else if (event.keyCode === p2Keys.currentLetter) {
         availableKeys.keys[p2Keys.currentLetter - 65].available = true;
         p2Keys.assignLetter(availableKeys.getKey());
-        p2.updateScore(20);
+        p2.updateScore(10);
+        sounds.playSuccess(Math.round(p2.getScore()/10 - 1), 2);
       }
     }
     else if (_game.state === 'attackSelection') {
@@ -341,7 +343,7 @@ function game() {
       switch (_game.defender) {
         case 1:
           p1.draw(ctx);
-          if (p1.getScore() >= 100) {
+          if (p1.getScore() >= DEBUGHEALTH) {//100) {
             _game.state = 'reversing'; //'attackFail';
             _game.playerOneReversed++;
 
@@ -350,7 +352,7 @@ function game() {
           break;
         case 2:
           p2.draw(ctx);
-          if (p2.getScore() >= 100) {
+          if (p2.getScore() >= DEBUGHEALTH) {//100) {
             _game.state = 'reversing'; //'attackFail';
             _game.playerTwoReversed++;
 
