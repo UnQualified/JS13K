@@ -355,15 +355,22 @@ function AvailableKeys() {
 	}
 }
 AvailableKeys.prototype.getKey = function() {
-	var index = rnd(0, this.keys.length-1);
-	var test = this.keys[index];
-	if (test.available) {
-		this.keys[index].available = false;
-		return test.key;
-	}
-	else {
-		return this.getKey();
-	}
+  var index = 0;
+  try {
+    index = rnd(0, this.keys.length-1);
+  }
+  catch (e) {
+    console.error(e);
+    index = 5;
+  }
+  var test = this.keys[index];
+  if (test.available) {
+    this.keys[index].available = false;
+  	return test.key;
+  }
+  else {
+  	return this.getKey();
+  }
 };
 
 function Attack(context, specialAvailable) {

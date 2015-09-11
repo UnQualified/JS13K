@@ -301,7 +301,6 @@ function game() {
       // how much time is left??
       var endTime = new Date().getTime() + _game.chosenAttack.time;
       var timeLeft = _game.chosenAttack.time - (endTime - time.start - _game.chosenAttack.time);
-      //console.log('timeLeft: ', timeLeft);
 
       if (timeLeft > 0) {
         // how far is left to go?
@@ -316,23 +315,14 @@ function game() {
         }
         else {
           sprites.ball.initialX = 780;
-          console.log(sprites.ball.initialX);
           endPoint = sprites.ball.initialX - distanceToCover;
-          console.log('endPoint: ', endPoint);
           remainingDistance = sprites.ball.x - endPoint;
-          console.log('remainingDistance: ', remainingDistance);
         }
-        //var remainingDistance = endPoint - sprites.ball.x;
 
         // how many pixels should x move at the current speed?
         var ppms = remainingDistance / timeLeft;
 
-        // update x relative to framerate
-        // THIS IS WHERE THE ISSUE IS
-        // see where x is currently...
-        //console.log('x: ', sprites.ball.x);
-        //console.log('initialX: ', sprites.ball.initialX);
-        //console.log('defender: ', _game.defender);
+        // display the ball!
         sprites.ball.show = true;
         if (_game.defender === 2) {
           sprites.ball.x += ppms * time.elapsed;
@@ -343,66 +333,79 @@ function game() {
       }
       else {
         // attack successful!
-        // reverse the attack...
         console.log('ouch...');
         sprites.ball.show = false;
         _game.state = 'attackSuccess';
       }
 
-      /*
-      frame++;
-      time.elapsed = time.now - time.start;
-      // TIME SPECIFIC STUFF HERE!!!
-      var seconds = 60 / _game.chosenAttack.speed * (time.now - time.start);//10;
-      //text(seconds + ' : ' + frame, centre.x, canvas.height - 50, 'center');
-      text(time.elapsed, centre.x, canvas.height - 50, 'center');
-
-      //sprites.ball.speed = 575 / (seconds / 10) / 10;
-      var _speed = _game.chosenAttack.speed * 1000;
-      var _distance = 575;
-      var _ppm = _distance / _speed;
-      time.elapsed = time.now - time.start;
-      var _go = (time.elapsed/100) * _ppm;
-      var _t = new Date().getTime() - time.lastCall;
-      if (_t < 1000) {
-        //console.error(_t);
-        sprites.ball.x += _t * _ppm;
-        console.log('X: ' + sprites.ball.x + ' + ' + (_t * _ppm));
-      } else {
-        console.error(_t);
-      }
-      //console.log('X: ' + sprites.ball.x + ' + ' + (_t * _ppm));
-      //sprites.ball.x += _t * _ppm;
-      //console.log('ELAPSED: ' + time.elapsed);
-      //sprites.ball.speed = _go;//time.elapsed * _ppm;
-      sprites.ball.show = true;
-      if (time.elapsed >= _game.chosenAttack.time) {
-        //console.log('ooouch!!');
-        _game.state = 'attackSuccess';
-      }
-      */
       switch (_game.defender) {
         case 1:
           p1.draw(ctx);
           if (p1.getScore() >= 100) {
-            _game.state = 'attackFail';
+            _game.state = 'reversing'; //'attackFail';
             _game.playerOneReversed++;
+
+            time.started = false;
           }
           break;
         case 2:
           p2.draw(ctx);
           if (p2.getScore() >= 100) {
-            _game.state = 'attackFail';
+            _game.state = 'reversing'; //'attackFail';
             _game.playerTwoReversed++;
+
+            time.started = false;
           }
           break;
       }
 
-      //if (frame >= seconds) {
-      //  _game.state = 'attackSuccess';
-      //}
-
       // update the last call time
+      time.lastCall = new Date().getTime();
+    }
+    else if(_game.state == 'reversing') {
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+        time.lastCall = time.start;
+      }
+      time.elapsed = new Date().getTime() - time.lastCall;
+
+      // how much time is left??
+      var reversalTime = 2000;
+      var _endTime = new Date().getTime() + reversalTime;
+      var _timeLeft = reversalTime - (_endTime - time.start - reversalTime);
+      var _distanceToCover = 0;
+      if (_game.defender === 1) {
+        _distanceToCover = sprites.ball.initialX - sprites.ball.x;
+      }
+      else {
+        _distanceToCover = sprites.ball.x - sprites.ball.initialX;
+      }
+
+      if (_timeLeft > 0) {
+        var _endPoint = 0;
+        var _remainingDistance = 0;
+        if (_game.defender === 1) {
+          _endPoint = 780;
+          _remainingDistance = _endPoint - sprites.ball.x;
+        }
+        else {
+          _endPoint = 180;
+          _remainingDistance = sprites.ball.x - _endPoint;
+        }
+        var _ppms = _remainingDistance / _timeLeft;
+        if (_game.defender === 1) {
+          sprites.ball.x += _ppms * time.elapsed;
+        }
+        else {
+          sprites.ball.x -= _ppms * time.elapsed;
+        }
+      }
+      else {
+        sprites.ball.show = false;
+        _game.state = 'attackFail';
+      }
+
       time.lastCall = new Date().getTime();
     }
     else if (_game.state == 'attackFail') {
