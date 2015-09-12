@@ -74,7 +74,7 @@ function game() {
   		special: {
   			type: 'special',
   			speed: 5,
-  			damage: 50,
+  			damage: 70,
   			colour: 'rbg(255,0,255)',
         time: 4000
   		}
@@ -278,7 +278,7 @@ function game() {
         text('mage ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
       }
       else {
-        var txt = 'uh oh. may the blessings of the mages be with you...';
+        var txt = 'uh oh...';
         text(txt, centre.x, centre.y, 'center');
       }
       frame++;
@@ -414,6 +414,7 @@ function game() {
       }
       else {
         sprites.ball.show = false;
+        time.started = false;
         _game.state = 'attackFail';
       }
 
@@ -498,6 +499,9 @@ function game() {
         _game.start = false;
         reset({state:'menu',health:true});
       }
+      sprites.stars.forEach(function (item) {
+        item.scroll();
+      })
     }
 
     window.requestAnimationFrame(loop);

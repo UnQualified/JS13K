@@ -113,6 +113,13 @@ function star(ctx, x, y, offset, offsetSpeed) {
       else {
         this.y -= offsetSpeed;
       }
+    },
+    scroll: function() {
+      this.y += offsetSpeed * 4;
+      if (this.y < -10) {
+        this.y -= canvas.height + 10;
+        this.x = rnd(0, canvas.width);
+      }
     }
   };
 }
