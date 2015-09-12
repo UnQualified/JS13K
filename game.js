@@ -81,6 +81,17 @@ function game() {
   		}
   };
 
+  var bot = {
+    says: [
+      'yikes. ',
+      'ouch. ',
+      ':( ',
+      'crikey. '
+    ],
+    set: false,
+    index: 0
+  };
+
   var sprites = {
     stars: starField(ctx, 30, offsets, offsetSpeeds),
     ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
@@ -175,11 +186,9 @@ function game() {
   function loop() {
     clear();
     draw();
-    //sprites.ball.update();
 
     // timing - update now counter at beginning of every loop
     time.now = new Date().getTime();
-    //console.log('ELAPSED: ' + time.elapsed);
 
     // logic
     ctx.fillStyle = 'black';
@@ -189,7 +198,6 @@ function game() {
       text('press [space]', centre.x, centre.y + 20, 'center');
     }
     else if (_game.state === 'intro') {
-      text('INTRO', centre.x, centre.y + 100, 'center');
       sprites.g.reduceOffset(offsetSpeeds.fast);
       sprites.mod.reduceOffset(offsetSpeeds.fast);
       sprites.w.reduceOffset(offsetSpeeds.fast);
@@ -214,10 +222,31 @@ function game() {
       }
       time.elapsed = time.now - time.start;
 
-      if (time.elapsed > 300 && time.elapsed < 1500) {
-        text('ok. mage powers are available in...', centre.x, centre.y, 'center');
+      var _bot = '';
+      if (!bot.set) {
+        bot.index = rnd(0, bot.says.length -1 );
+        if (_game.playerOneHealth < 100 || _game.playerTwoHealth < 100) {
+          _bot = bot.says[bot.index];
+        }
+        else {
+          _bot = 'ok. ';
+        }
+        bot.set = true;
+      }
+      else {
+        if (_game.playerOneHealth < 100 || _game.playerTwoHealth < 100) {
+          _bot = bot.says[bot.index];
+        }
+        else {
+          _bot = 'ok. ';
+        }
+      }
+
+      if (time.elapsed < 1500) {
+        text(_bot + 'mage powers are available in...', centre.x, centre.y, 'center');
       }
       else if (time.elapsed >= 1500 && time.elapsed < 2500) {
+        bot.set = false;
         text('three', centre.x, centre.y, 'center');
       }
       else if (time.elapsed >= 2500 && time.elapsed < 3500) {
@@ -252,7 +281,7 @@ function game() {
         if (time.elapsed < 1500) {//if (frame < 120) {
           //console.log('1.5 seconds have passed!');
           frame++;
-          winner = p1.getScore() >= DEBUGHEALTH ? 'player one' : 'player two';
+          winner = p1.getScore() >= DEBUGHEALTH ? 'mage one' : 'mage two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
           _game.defender = _game.tossWinner === 1 ? 2 : 1;
           sprites.ball.setPlayer(_game.tossWinner);
@@ -297,17 +326,25 @@ function game() {
       }
       time.elapsed = time.now - time.start;
       sprites.ball.setAttack(_game.chosenAttack);
-      var aMsg = 'player ' + _game.tossWinner + ' does a ' + _game.chosenAttack.type + ' attack';
+      var num = _game.tossWinner === 1 ? 'one' : 'two';
+      var grammer = _game.chosenAttack.type === 'electric' ? 'n' : '';
+      var aMsg = '';
+      if (_game.chosenAttack.type !== 'special') {
+        aMsg = 'mage ' + num + ' casts a ' + grammer + _game.chosenAttack.type + ' spell';
+      }
+      else {
+        aMsg = 'mage ' + num + ' casts the ultimate dark magic spell';
+      }
       text(aMsg, centre.x, centre.y, 'center');
       frame++;
-      if (time.elapsed > 1500) {//frame >= 120) {
-        //console.log('1500 milliseconds have passed!');
+      if (time.elapsed > 1500) {
         time.started = false;
         reset({state:'defense'});
       }
     }
     else if (_game.state == 'defense') {
       if (_game.chosenAttack.type !== 'special') {
+        var _n = _game.defender === 1 ? 'one' : 'two';
         text('mage ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
       }
       else {
