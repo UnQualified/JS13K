@@ -1,13 +1,17 @@
 {
   "name": "JS13K",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "A local multiplayer fighting game, where players control mages who cast spells at each other. Or something.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/unqualified/js13k.git"
+  },
   "author": "UnQualified <unqualified@outlook.com>",
-  "license": "ISC",
+  "license": "CC",
   "devDependencies": {
     "colors": "^1.1.2",
     "gulp": "^3.9.0",
