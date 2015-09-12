@@ -203,7 +203,35 @@ function game() {
         _game.start = true;
       }
       if (_game.start) {
+        _game.state = 'preToss';
+      }
+    }
+    else if (_game.state === 'preToss') {
+      if (!time.started) {
+        time.elapsed = 0;
+        time.start = new Date().getTime();
+        time.started = true;
+      }
+      time.elapsed = time.now - time.start;
+
+      if (time.elapsed > 300 && time.elapsed < 1500) {
+        text('ok. mage powers are available in...', centre.x, centre.y, 'center');
+      }
+      else if (time.elapsed >= 1500 && time.elapsed < 2500) {
+        text('three', centre.x, centre.y, 'center');
+      }
+      else if (time.elapsed >= 2500 && time.elapsed < 3500) {
+        text('two', centre.x, centre.y, 'center');
+      }
+      else if (time.elapsed >= 3500 && time.elapsed < 4500) {
+        text('one', centre.x, centre.y, 'center');
+      }
+      else if (time.elapsed >= 4500 && time.elapsed < 5500) {
+        text('duel!', centre.x, centre.y, 'center');
+      }
+      else if (time.elapsed >= 5500) {
         _game.state = 'toss';
+        time.started = false;
       }
     }
     else if (_game.state === 'toss') {
@@ -349,6 +377,7 @@ function game() {
         // attack successful!
         console.log('ouch...');
         sprites.ball.show = false;
+        time.started = false;
         _game.state = 'attackSuccess';
       }
 
@@ -439,7 +468,7 @@ function game() {
         }
         else {
           sounds.playOuch(2);
-          _game.state = 'toss';
+          _game.state = 'preToss';
         }
       }
       else {
@@ -449,11 +478,12 @@ function game() {
           _game.playerOneHealth = 0;
           sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
+          time.started = false;
           sounds.playDeath(1);
         }
         else {
           sounds.playOuch(1);
-          _game.state = 'toss';
+          _game.state = 'preToss';
         }
       }
     }
@@ -467,7 +497,7 @@ function game() {
           _game.playerOneHealth = 0;
           sprites.ps1.health = _game.playerOneHealth;
           _game.state = 'gameOver';
-          frame = 0;
+          time.started = false;
           _continue = false;
           sounds.playDeath(1);
         }
@@ -482,7 +512,7 @@ function game() {
           _game.playerTwoHealth = 0;
           sprites.ps2.health = _game.playerTwoHealth;
           _game.state = 'gameOver';
-          frame = 0;
+          time.started = false;
           _continue = false;
           sounds.playDeath(2);
         }
@@ -492,7 +522,7 @@ function game() {
       }
 
       if (_continue) {
-        reset({state:'toss'});
+        reset({state:'preToss'});
       }
     }
     else if (_game.state == 'gameOver') {
@@ -544,7 +574,7 @@ function game() {
 
       if (time.elapsed > 2000) {
         _game.canReset = true;
-        text('press any key to go again...', centre.x, centre.y + 100, 'center');
+        text('press any key to go again...', centre.x, centre.y + 120, 'center');
       }
     }
 
