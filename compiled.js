@@ -345,7 +345,7 @@ function game() {
     else if (_game.state == 'defense') {
       if (_game.chosenAttack.type !== 'special') {
         var _n = _game.defender === 1 ? 'one' : 'two';
-        text('mage ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+        text('mage ' + _n + ', reverse it!!', centre.x, centre.y, 'center');
       }
       else {
         var txt = 'uh oh...';
@@ -1098,11 +1098,11 @@ Attack.prototype.displayAttacks = function(canvasCentre, special) {
   this.ctx.fillStyle = 'white';
   this.ctx.shadowBlur = 20;
   this.ctx.shadowColor = 'white';
-	this.ctx.fillText('fire', canvasCentre.x - 100, canvasCentre.y);
-	this.ctx.fillText('water', canvasCentre.x, canvasCentre.y - 100);
-	this.ctx.fillText('electric', canvasCentre.x + 105, canvasCentre.y);
+	this.ctx.fillText('(F) fire', canvasCentre.x - 100, canvasCentre.y);
+	this.ctx.fillText('(W) water', canvasCentre.x, canvasCentre.y - 100);
+	this.ctx.fillText('(E) electric', canvasCentre.x + 105, canvasCentre.y);
   if (special) {
-    this.ctx.fillText('special', canvasCentre.x, canvasCentre.y + 100);
+    this.ctx.fillText('(S) special', canvasCentre.x, canvasCentre.y + 100);
   }
 };
 Attack.prototype.selectedAttack = function(msg) {

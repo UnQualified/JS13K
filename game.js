@@ -345,7 +345,7 @@ function game() {
     else if (_game.state == 'defense') {
       if (_game.chosenAttack.type !== 'special') {
         var _n = _game.defender === 1 ? 'one' : 'two';
-        text('mage ' + _game.defender + ', reverse it!!', centre.x, centre.y, 'center');
+        text('mage ' + _n + ', reverse it!!', centre.x, centre.y, 'center');
       }
       else {
         var txt = 'uh oh...';
