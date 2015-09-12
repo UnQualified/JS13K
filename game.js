@@ -168,7 +168,7 @@ function game() {
       }
       else if (_game.state === 'winner' && _game.canReset) {
         // reset the game
-        console.log('CAN RESET!!!');
+        window.location.reload(false);
       }
     });
 
