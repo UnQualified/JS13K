@@ -795,14 +795,6 @@ function attackBall(ctx, x, y, radius, speed, player) {
         ctx.shadowBlur = 0;
       }
     },
-    update: function() {
-      if (this.show) {
-        this.x += this.player === 1 ? this.speed : this.speed * -1;
-      }
-      else {
-        //this.x = this.player === 1 ? 180;
-      }
-    },
     getInitialX: function() {
       return initialX;
     }
