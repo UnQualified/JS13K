@@ -45,7 +45,8 @@ function game() {
   		tossWinner: null,
   		chosenAttack: null,
   		defender: null,
-  		start: false
+  		start: false,
+      canReset: false
   };
   var MAXHEALTH = 100;
   var DEBUGHEALTH = 50;
@@ -164,6 +165,10 @@ function game() {
             break;
           }
         }
+      }
+      else if (_game.state === 'winner' && _game.canReset) {
+        // reset the game
+        console.log('CAN RESET!!!');
       }
     });
 
@@ -491,17 +496,56 @@ function game() {
       }
     }
     else if (_game.state == 'gameOver') {
-      var msg = _game.playerOneHealth <= 0 ? 'Player 2' : 'Player 1';
-      msg += ' wins';
-      text(msg, centre.x, centre.y, 'center');
-      frame++;
-      if (frame >= 120) {
-        _game.start = false;
-        reset({state:'menu',health:true});
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+        time.lastCall = time.start;
       }
+      time.elapsed = new Date().getTime() - time.start;
+      if (time.elapsed > 1500) {
+        // do death animation
+        _game.state = 'winner';
+        time.started = false;
+      }
+
+      time.lastCall = new Date().getTime();
+    }
+    else if (_game.state === 'winner') {
+      if (!time.started) {
+        time.start = new Date().getTime();
+        time.started = true;
+        time.lastCall = time.start;
+      }
+      time.elapsed = new Date().getTime() - time.start;
+
+      // move everything off the screen
+      sprites.g.y = 2000;
+      sprites.mod.y = 2000;
+      sprites.w.y = 2000;
+      sprites.m.y += 0.5;
+      var _winner = _game.playerOneHealth <= 0 ? 2 : 1;
+      if (_winner === 1) {
+        sprites.ps2.y = 2000;
+        sprites.ps1.x = centre.x;
+        sprites.ps1.y = centre.y;
+        text('mage one wins!', centre.x, centre.y + 80, 'center');
+      }
+      else {
+        sprites.ps1.y = 2000;
+        sprites.ps2.x = centre.x;
+        sprites.ps2.y = centre.y;
+        text('mage two wins!', centre.x, centre.y + 80, 'center');
+      }
+
+      // make the stars loop
       sprites.stars.forEach(function (item) {
         item.scroll();
-      })
+      });
+
+      if (time.elapsed > 2000) {
+        _game.canReset = true;
+        text('press any key to go again...', centre.x, centre.y + 100, 'center');
+      }
     }
 
     window.requestAnimationFrame(loop);
@@ -592,11 +636,12 @@ function game() {
     sprites.m.draw();
     sprites.g.draw();
 
-    sprites.ps1.draw(_game.playerOneReversed, _game.playerOneHealth);
-    sprites.ps1.drawReflection();
-
-    sprites.ps2.draw(_game.playerTwoReversed, _game.playerTwoHealth);
-    sprites.ps2.drawReflection();
+    sprites.ps1.draw(_game.playerOneReversed, _game.playerOneHealth, _game.state);
+    sprites.ps2.draw(_game.playerTwoReversed, _game.playerTwoHealth, _game.state);
+    if (_game.state !== 'winner') {
+      sprites.ps1.drawReflection();
+      sprites.ps2.drawReflection();
+    }
 
     sprites.w.draw();
   }
@@ -720,8 +765,8 @@ function star(ctx, x, y, offset, offsetSpeed) {
     },
     scroll: function() {
       this.y += offsetSpeed * 4;
-      if (this.y < -10) {
-        this.y -= canvas.height + 10;
+      if (this.y > canvas.height) {
+        this.y = rnd(-15, -5);
         this.x = rnd(0, canvas.width);
       }
     }
@@ -831,7 +876,7 @@ function playerSprite(ctx, x, y, offset, number) {
     y: y + offset,
     health: 100,
     scrollComplete: false,
-    draw: function(reversals, health) {
+    draw: function(reversals, health, state) {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
       // health
@@ -859,25 +904,26 @@ function playerSprite(ctx, x, y, offset, number) {
       ctx.fill(p);
       ctx.shadowBlur = 0;
 
-      // draw the special counter
-      if (reversals > 0) {
-        reversals = reversals > 3 ? 3 : reversals;
-        var rad = 7;
-        for (var i = 1; i <= reversals; i++) {
-          ctx.fillStyle = 'white';
-          ctx.shadowColor = 'white';
-          ctx.shadowBlur = 15;
-          ctx.beginPath();
-          ctx.arc(this.x - (dir * 45), this.y - 20 - (i * 20), rad, 0, Math.PI * 2, true);
-          ctx.closePath();
-          ctx.fill();
+      if (state !== 'winner') {
+        // draw the special counter
+        if (reversals > 0) {
+          reversals = reversals > 3 ? 3 : reversals;
+          var rad = 7;
+          for (var i = 1; i <= reversals; i++) {
+            ctx.fillStyle = 'white';
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(this.x - (dir * 45), this.y - 20 - (i * 20), rad, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+          }
         }
+
+        // draw the health bar
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.x - (dir * 70), this.y, 10, health * -1);
       }
-
-      // draw the health bar
-      ctx.fillStyle = 'white';
-      ctx.fillRect(this.x - (dir * 70), this.y, 10, health * -1);
-
 
       // hood
       var h = new Path2D();

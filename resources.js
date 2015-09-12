@@ -116,8 +116,8 @@ function star(ctx, x, y, offset, offsetSpeed) {
     },
     scroll: function() {
       this.y += offsetSpeed * 4;
-      if (this.y < -10) {
-        this.y -= canvas.height + 10;
+      if (this.y > canvas.height) {
+        this.y = rnd(-15, -5);
         this.x = rnd(0, canvas.width);
       }
     }
@@ -227,7 +227,7 @@ function playerSprite(ctx, x, y, offset, number) {
     y: y + offset,
     health: 100,
     scrollComplete: false,
-    draw: function(reversals, health) {
+    draw: function(reversals, health, state) {
       var p = new Path2D();
       ctx.fillStyle = 'rgb(255,255,255)';
       // health
@@ -255,25 +255,26 @@ function playerSprite(ctx, x, y, offset, number) {
       ctx.fill(p);
       ctx.shadowBlur = 0;
 
-      // draw the special counter
-      if (reversals > 0) {
-        reversals = reversals > 3 ? 3 : reversals;
-        var rad = 7;
-        for (var i = 1; i <= reversals; i++) {
-          ctx.fillStyle = 'white';
-          ctx.shadowColor = 'white';
-          ctx.shadowBlur = 15;
-          ctx.beginPath();
-          ctx.arc(this.x - (dir * 45), this.y - 20 - (i * 20), rad, 0, Math.PI * 2, true);
-          ctx.closePath();
-          ctx.fill();
+      if (state !== 'winner') {
+        // draw the special counter
+        if (reversals > 0) {
+          reversals = reversals > 3 ? 3 : reversals;
+          var rad = 7;
+          for (var i = 1; i <= reversals; i++) {
+            ctx.fillStyle = 'white';
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(this.x - (dir * 45), this.y - 20 - (i * 20), rad, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+          }
         }
+
+        // draw the health bar
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.x - (dir * 70), this.y, 10, health * -1);
       }
-
-      // draw the health bar
-      ctx.fillStyle = 'white';
-      ctx.fillRect(this.x - (dir * 70), this.y, 10, health * -1);
-
 
       // hood
       var h = new Path2D();
