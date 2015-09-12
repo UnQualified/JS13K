@@ -4,7 +4,6 @@ function game() {
   var ctx = canvas.getContext('2d');
   canvas.width = 960;
   canvas.height = 540;
-  //canvas.style.backgroundColor = 'rgb(0,0,0)';
   var centre = getCanvasCentre();
   var time = {
     elapsed: 0,
@@ -24,7 +23,6 @@ function game() {
   var p2 = player(720, canvas.height / 2 + 100, p2Keys);
   var attacks = new Attack(ctx);
 
-  var frame = 0;
   var offsets = {
     yOffset: canvas.height * 1.25,
     medYOffset: canvas.height * 1.25 * 0.1,
@@ -96,7 +94,7 @@ function game() {
     stars: starField(ctx, 30, offsets, offsetSpeeds),
     ball: attackBall(ctx, 180, 320 - 30, 40, 5, 1),
     g: ground(ctx, 0, 400 - 30, offsets.yOffset),
-    ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset), //this.g.y - 30)
+    ps1: playerSprite(ctx, 150, 370 - 30, offsets.yOffset),
     ps2: playerSprite(ctx, 810, 370 - 30, offsets.yOffset, 2),
     w: water(ctx, 0, 410 - 30, offsets.yOffset),
     mod: modesty(ctx, 0, 380, offsets.yOffset),
@@ -107,7 +105,6 @@ function game() {
   window.addEventListener("keydown", function (event) {
     if (_game.state === 'menu') {
       if (event.keyCode === 32) {
-        //_game.start = true;
         _game.state = 'intro';
       }
     }
@@ -160,7 +157,6 @@ function game() {
             _game.chosenAttack = powers.electric;
             break;
           case 83:
-            // this might need to be >= 2
             if ((_game.defender === 1 && _game.playerTwoReversed >= 3) ||
                 (_game.defender === 2 && _game.playerOneReversed >= 3)) {
 
@@ -170,8 +166,6 @@ function game() {
 
                 _game.playerTwoReversed = _game.defender === 2 ? 0 : _game.playerTwoReversed;
                 _game.playerOneReversed = _game.defender === 1 ? 0 : _game.playerOneReversed;
-
-                // play bad sound...
             }
             break;
           }
@@ -277,20 +271,15 @@ function game() {
         }
         time.elapsed = time.now - time.start;
         var winner = '';
-        //console.log(time.elapsed);
-        if (time.elapsed < 1500) {//if (frame < 120) {
-          //console.log('1.5 seconds have passed!');
-          frame++;
+        if (time.elapsed < 1500) {
           winner = p1.getScore() >= DEBUGHEALTH ? 'mage one' : 'mage two';
           _game.tossWinner = p1.getScore() >= DEBUGHEALTH ? 1 : 2;
           _game.defender = _game.tossWinner === 1 ? 2 : 1;
           sprites.ball.setPlayer(_game.tossWinner);
           winner += ' has the power';
         }
-        else if (time.elapsed < 3000) {//frame < 240) {
-          //console.log('2.2 seconds have passed');
+        else if (time.elapsed < 3000) {
           winner = 'choose your attack';
-          frame++;
         }
         else {
           winner = null;
@@ -327,16 +316,15 @@ function game() {
       time.elapsed = time.now - time.start;
       sprites.ball.setAttack(_game.chosenAttack);
       var num = _game.tossWinner === 1 ? 'one' : 'two';
-      var grammer = _game.chosenAttack.type === 'electric' ? 'n' : '';
+      var grammer = _game.chosenAttack.type === 'electric' ? 'n ' : ' ';
       var aMsg = '';
       if (_game.chosenAttack.type !== 'special') {
-        aMsg = 'mage ' + num + ' casts a ' + grammer + _game.chosenAttack.type + ' spell';
+        aMsg = 'mage ' + num + ' casts a' + grammer + _game.chosenAttack.type + ' spell';
       }
       else {
         aMsg = 'mage ' + num + ' casts the ultimate dark magic spell';
       }
       text(aMsg, centre.x, centre.y, 'center');
-      frame++;
       if (time.elapsed > 1500) {
         time.started = false;
         reset({state:'defense'});
@@ -351,7 +339,7 @@ function game() {
         var txt = 'uh oh...';
         text(txt, centre.x, centre.y, 'center');
       }
-      frame++;
+
       // reset the time
       if (!time.started) {
         time.elapsed = 0;
@@ -360,8 +348,7 @@ function game() {
       }
       time.elapsed = time.now - time.start;
 
-      if (time.elapsed > 1500) {//frame >= 120) {
-        //console.log('moving into attackincoming phase...');
+      if (time.elapsed > 1500) {
         time.started = false;
         reset({state:'attackIncoming'});
         time.lastCall = new Date().getDate();
@@ -384,7 +371,6 @@ function game() {
       if (timeLeft > 0) {
         // how far is left to go?
         var distanceToCover = 600;
-        //var endPoint = sprites.ball.initialX + distanceToCover;
         var endPoint = 0;
         var remainingDistance = 0;
         if (_game.defender === 2) {
@@ -422,8 +408,8 @@ function game() {
         switch (_game.defender) {
           case 1:
             p1.draw(ctx);
-            if (p1.getScore() >= DEBUGHEALTH) {//100) {
-              _game.state = 'reversing'; //'attackFail';
+            if (p1.getScore() >= DEBUGHEALTH) {
+              _game.state = 'reversing';
               _game.playerOneReversed++;
 
               time.started = false;
@@ -431,8 +417,8 @@ function game() {
             break;
           case 2:
             p2.draw(ctx);
-            if (p2.getScore() >= DEBUGHEALTH) {//100) {
-              _game.state = 'reversing'; //'attackFail';
+            if (p2.getScore() >= DEBUGHEALTH) {
+              _game.state = 'reversing';
               _game.playerTwoReversed++;
 
               time.started = false;
@@ -570,7 +556,6 @@ function game() {
       }
       time.elapsed = new Date().getTime() - time.start;
       if (time.elapsed > 1500) {
-        // do death animation
         _game.state = 'winner';
         time.started = false;
       }
@@ -655,7 +640,6 @@ function game() {
   }
 
   function reset(options) {
-    frame = 0;
     p1.resetScore();
     p2.resetScore();
     if (options === undefined) {
@@ -690,9 +674,6 @@ function game() {
   }
 
   function draw() {
-    //backgroundOne(ctx);
-    //backgroundTwo(ctx);
-
     // stars
     sprites.stars.forEach(function (s) {
       s.draw();
